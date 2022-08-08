@@ -48,6 +48,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_crashlytics: ^2.8.6
   firebase_core: ^1.20.0
+  firebase_remote_config: ^2.0.13
+  firebase_analytics: ^9.3.0
 
 dev_dependencies:
   json_serializable: ^6.3.1
