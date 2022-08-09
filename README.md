@@ -19,3 +19,4 @@ Firebase Remote Configs
 Firebase Crashlytics
 
 ## Download
+[app](https://disk.yandex.ru/d/FSZgFcrhkY09rg) 
