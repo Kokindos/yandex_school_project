@@ -4,7 +4,6 @@ import 'package:done/feature/app/models/task.dart';
 
 import '../models/response/list_response.dart';
 
-
 class NetworkTaskBackend {
   final Dio _client;
 
@@ -14,7 +13,9 @@ class NetworkTaskBackend {
       {required Task task, required int revision}) async {
     final response = await _client.post(
       '/list',
-      data: {"element": task.toJson()},
+      data: {
+        "element": task.toJson(),
+      },
       options: Options(
         headers: {'X-Last-Known-Revision': revision},
       ),
@@ -43,7 +44,9 @@ class NetworkTaskBackend {
     //print('${task.id}');
     final response = await _client.put(
       '/list/${task.id}',
-      data: {"element": task.toJson()},
+      data: {
+        "element": task.toJson(),
+      },
       options: Options(
         headers: {'X-Last-Known-Revision': revision},
       ),

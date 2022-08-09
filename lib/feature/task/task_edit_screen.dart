@@ -23,14 +23,11 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-
-
-
   DateTime currentDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    final navigationService=context.read<NavigationService>();
+    final navigationService = context.read<NavigationService>();
     return BlocProvider(
       create: (context) => TaskEditBloc(
         context.read<TaskRepository>(),
@@ -82,7 +79,7 @@ class _TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<_TaskPage> {
-  var scrollOverflow=false;
+  var scrollOverflow = false;
 
   Future<void> _selectDate(BuildContext context) async {
     final bloc = context.read<TaskEditBloc>();
@@ -100,7 +97,7 @@ class _TaskPageState extends State<_TaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: scrollOverflow? 4:0,
+        elevation: scrollOverflow ? 4 : 0,
         leading: IconButton(
           onPressed: widget.navigationService.onPop,
           icon: const Icon(Icons.close),
@@ -123,15 +120,14 @@ class _TaskPageState extends State<_TaskPage> {
       ),
       body: SafeArea(
         child: NotificationListener<ScrollUpdateNotification>(
-          onNotification: (n){
-            if(n.metrics.pixels>40){
+          onNotification: (n) {
+            if (n.metrics.pixels > 40) {
               setState(() {
-                scrollOverflow=true;
+                scrollOverflow = true;
               });
-            }
-            else{
+            } else {
               setState(() {
-                scrollOverflow=false;
+                scrollOverflow = false;
               });
             }
             return true;
@@ -241,8 +237,8 @@ class _TaskPageState extends State<_TaskPage> {
                                     AppLocalizations.of(context)?.localeName)
                                 .format(DateTime.fromMicrosecondsSinceEpoch(
                                     widget.deadline!)),
-                            style:
-                                TextStyle(color: Theme.of(context).primaryColor),
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
                           )
                         else
                           const SizedBox(
