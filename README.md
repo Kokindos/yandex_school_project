@@ -1,16 +1,21 @@
-# yandex_project
+# Done
+Done - Flutter-приложение, с помощью которого можно удобно вести учет своих задач.
+Достигните успеха с Done: управляйте целями и задачами, расставляйте приоритеты и дедлайны, и выполняйте все, что спланировали.
 
-A new Flutter project.
 
-## Getting Started
+![screenshot](https://user-images.githubusercontent.com/90920052/183743247-e693f71c-db7e-4484-b6e0-7224a6ef8c28.jpg)
+## Features
 
-This project is a starting point for a Flutter application.
+* Cоздание, редактирование, удаление задач
+* Cортировка выполненных/невыполненных задач
+* Поддержка двух языков - Русский и English
 
-A few resources to get you started if this is your first Flutter project:
+* Полностью онлайн
+* Переключение цвета важности при перезапуске приложения
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Integrations
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Firebase Remote Configs
+Firebase Crashlytics
+
+## Download
