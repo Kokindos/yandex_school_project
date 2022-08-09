@@ -6,14 +6,10 @@ import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_repository.dart';
 import 'package:done/feature/task/bloc/task_edit_bloc.dart';
 import 'package:done/feature/task/bloc/task_edit_state.dart';
-import 'package:done/feature/app/repositories/task_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:done/feature/app/models/priority.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import 'package:done/feature/app/models/task.dart';
 
 class TaskScreen extends StatefulWidget {
   final Task? task;
@@ -71,7 +67,7 @@ class _TaskScreenState extends State<TaskScreen> {
 }
 
 class _TaskPage extends StatelessWidget {
-  _TaskPage(
+  const _TaskPage(
     this.navigationService,
     this.textController,
     this.importance,
@@ -82,6 +78,18 @@ class _TaskPage extends StatelessWidget {
   final TextEditingController textController;
   final Priority importance;
   final int? deadline;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final bloc = context.read<TaskEditBloc>();
+    final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2022),
+        lastDate: DateTime(2122));
+    if (pickedDate != null) {
+      bloc.changeDeadline(pickedDate);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,25 +112,7 @@ class _TaskPage extends StatelessWidget {
                   .button!
                   .copyWith(color: Theme.of(context).primaryColor),
             ),
-          )
-          // InkWell(
-          //   onTap: () {},
-          //   child: Container(
-          //     height: 24, //fix
-          //     padding: const EdgeInsets.only(
-          //       right: 16,
-          //     ),
-          //     child: Center(
-          //       child: Text(
-          //         AppLocalizations.of(context)!.save,
-          //         style: Theme.of(context)
-          //             .textTheme
-          //             .button!
-          //             .copyWith(color: Theme.of(context).primaryColor),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          ),
         ],
       ),
       body: SafeArea(
@@ -166,7 +156,7 @@ class _TaskPage extends StatelessWidget {
             Text(AppLocalizations.of(context)!.importance),
             Row(
               children: [
-                Container(
+                SizedBox(
                   width: 150,
                   child: DropdownButton<Priority>(
                     style: TextStyle(color: Theme.of(context).hintColor),
@@ -200,7 +190,6 @@ class _TaskPage extends StatelessWidget {
                     },
                   ),
                 ),
-
               ],
             ),
             const Divider(),
@@ -218,15 +207,17 @@ class _TaskPage extends StatelessWidget {
                       Text(AppLocalizations.of(context)!.doneUntil),
                       if (deadline != null)
                         Text(
-                          DateFormat('d MMMM y',AppLocalizations.of(context)?.localeName).format(
-                              DateTime.fromMicrosecondsSinceEpoch(deadline!)),
+                          DateFormat('d MMMM y',
+                                  AppLocalizations.of(context)?.localeName)
+                              .format(DateTime.fromMicrosecondsSinceEpoch(
+                                  deadline!)),
                           style:
                               TextStyle(color: Theme.of(context).primaryColor),
                         )
                       else
                         const SizedBox(
                           height: 20,
-                        ), //fix
+                        ),
                     ],
                   ),
                 ),
@@ -306,17 +297,5 @@ class _TaskPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final bloc = context.read<TaskEditBloc>();
-    final DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2022),
-        lastDate: DateTime(2122));
-    if (pickedDate != null) {
-      bloc.changeDeadline(pickedDate);
-    }
   }
 }

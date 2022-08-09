@@ -122,8 +122,8 @@ class _TaskListPageState extends State<_TaskListPage> {
                       maxLines: null,
                       minLines: 1,
                       keyboardType: TextInputType.multiline,
-                      decoration: const InputDecoration(
-                        hintText: 'Hoвое',
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!.newTask,
                       ),
                     ),
                   ),
