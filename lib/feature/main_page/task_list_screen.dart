@@ -101,33 +101,38 @@ class _TaskListPageState extends State<_TaskListPage> {
         ),
         SliverList(
           delegate: SliverChildListDelegate([
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: Theme.of(context).backgroundColor,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 7),
-              child: Column(
-                children: [
-                  for (var task in widget.tasks) _Item(task: task),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 51),
-                    child: TextField(
-                      textInputAction: TextInputAction.done,
-                      controller: textEditingController,
-                      onSubmitted: (value) => context
-                          .read<TaskListBloc>()
-                          .createQuickTask(
-                              textController: textEditingController),
-                      maxLines: null,
-                      minLines: 1,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.newTask,
+            Material(
+              borderRadius: BorderRadius.circular(16),
+              elevation: 2.2,
+              shadowColor: Colors.black54,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Theme.of(context).backgroundColor,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 7),
+                child: Column(
+                  children: [
+                    for (var task in widget.tasks) _Item(task: task),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 36),
+                      child: TextField(
+                        textInputAction: TextInputAction.done,
+                        controller: textEditingController,
+                        onSubmitted: (value) => context
+                            .read<TaskListBloc>()
+                            .createQuickTask(
+                                textController: textEditingController),
+                        maxLines: null,
+                        minLines: 1,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.newTask,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ]),
@@ -217,37 +222,37 @@ class _ItemState extends State<_Item> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Stack(alignment: Alignment.center, children: [
-                if (widget.task.importance == Priority.important)
-                  Container(
-                    height: 15,
-                    width: 15,
-                    color: context
-                        .read<RemoteConfigService>()
-                        .getColor
-                        .withOpacity(.2),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (widget.task.importance == Priority.important)
+                    Container(
+                      height: 15,
+                      width: 15,
+                      color: context
+                          .read<RemoteConfigService>()
+                          .getColor
+                          .withOpacity(.2),
+                    ),
+                  Checkbox(
+                    value: widget.task.done,
+                    onChanged: (value) {
+                      context.read<TaskListBloc>().setDoneTask(widget.task);
+                    },
+                    activeColor: AppTheme.green,
+                    side: BorderSide(
+                        width: 2,
+                        color: widget.task.importance == Priority.important
+                            ? context.read<RemoteConfigService>().getColor
+                            : Theme.of(context).dividerColor),
                   ),
-                Checkbox(
-                  value: widget.task.done,
-                  onChanged: (value) {
-                    context.read<TaskListBloc>().setDoneTask(widget.task);
-                  },
-                  activeColor: AppTheme.green,
-                  side: BorderSide(
-                      width: 2,
-                      color: widget.task.importance == Priority.important
-                          ? context.read<RemoteConfigService>().getColor
-                          : Theme.of(context).dividerColor),
-                ),
-              ]),
-              const SizedBox(
-                width: 15,
+                ],
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -256,7 +261,10 @@ class _ItemState extends State<_Item> {
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           widget.task.text,
-                          style: Theme.of(context).textTheme.overline,
+                          style: Theme.of(context)
+                              .textTheme
+                              .overline!
+                              .copyWith(decoration: TextDecoration.lineThrough),
                         )
                       else
                         Row(
@@ -283,15 +291,19 @@ class _ItemState extends State<_Item> {
                                       allowDrawingOutsideViewBox: true,
                                     ),
                                   ),
-                              Text(
-                                widget.task.text,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
+                              Flexible(
+                                child: Text(
+                                  widget.task.text,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ]),
                       if (widget.task.deadline != null)
                         Text(
-                          DateFormat('d MMMM y').format(
+                          DateFormat('d MMMM y',
+                                  AppLocalizations.of(context)?.localeName)
+                              .format(
                             DateTime.fromMicrosecondsSinceEpoch(
                                 widget.task.deadline!),
                           ),

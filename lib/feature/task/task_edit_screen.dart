@@ -131,7 +131,8 @@ class _TaskPage extends StatelessWidget {
                 ),
               );
               return Material(
-                elevation: 3,
+                elevation: 2.2,
+                shadowColor: Colors.black54,
                 borderRadius: BorderRadius.circular(8),
                 child: TextFormField(
                   controller: textController,
@@ -156,45 +157,51 @@ class _TaskPage extends StatelessWidget {
             Text(AppLocalizations.of(context)!.importance),
             Row(
               children: [
-                SizedBox(
-                  width: 150,
-                  child: DropdownButton<Priority>(
-                    style: TextStyle(color: Theme.of(context).hintColor),
-                    borderRadius: BorderRadius.circular(2),
-                    iconDisabledColor: Colors.transparent,
-                    iconEnabledColor: Colors.transparent,
-                    value: importance,
-                    items: [
-                      DropdownMenuItem(
-                        value: Priority.basic,
-                        child: Text(AppLocalizations.of(context)!.no),
-                      ),
-                      DropdownMenuItem(
-                        value: Priority.low,
-                        child: Text(AppLocalizations.of(context)!.low),
-                      ),
-                      DropdownMenuItem(
-                        value: Priority.important,
-                        child: Text(
-                          AppLocalizations.of(context)!.high,
-                          style: TextStyle(
-                              color:
-                                  context.read<RemoteConfigService>().getColor),
+                DropdownButtonHideUnderline(
+                  child: SizedBox(
+                    height: 30,
+                    width: 150,
+                    child: DropdownButton<Priority>(
+                      style: TextStyle(color: Theme.of(context).hintColor),
+                      borderRadius: BorderRadius.circular(2),
+                      iconDisabledColor: Colors.transparent,
+                      iconEnabledColor: Colors.transparent,
+                      value: importance,
+                      items: [
+                        DropdownMenuItem(
+                          value: Priority.basic,
+                          child: Text(
+                            AppLocalizations.of(context)!.no,
+                          ),
                         ),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        context.read<TaskEditBloc>().changePriority(value);
-                      }
-                    },
+                        DropdownMenuItem(
+                          value: Priority.low,
+                          child: Text(AppLocalizations.of(context)!.low),
+                        ),
+                        DropdownMenuItem(
+                          value: Priority.important,
+                          child: Text(
+                            AppLocalizations.of(context)!.high,
+                            style: TextStyle(
+                                color: context
+                                    .read<RemoteConfigService>()
+                                    .getColor),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          context.read<TaskEditBloc>().changePriority(value);
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],
             ),
             const Divider(),
             const SizedBox(
-              height: 16,
+              height: 10,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,10 +239,10 @@ class _TaskPage extends StatelessWidget {
                     }),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             const Divider(),
             const SizedBox(
-              height: 22,
+              height: 15,
             ),
             BlocBuilder<TaskEditBloc, TaskEditState>(
               builder: (builder, state) {

@@ -72,8 +72,8 @@ abstract class AppTheme {
             fontSize: 16,
             height: 20 / 16,
             fontWeight: FontWeight.w400,
+            letterSpacing: 0.10,
             color: Colors.black.withOpacity(.3),
-            decoration: TextDecoration.lineThrough,
           ),
         ),
       );
