@@ -176,7 +176,9 @@ class _TaskPage extends StatelessWidget {
                         ),
                         DropdownMenuItem(
                           value: Priority.low,
-                          child: Text(AppLocalizations.of(context)!.low),
+                          child: Text(
+                            AppLocalizations.of(context)!.low,
+                          ),
                         ),
                         DropdownMenuItem(
                           value: Priority.important,
