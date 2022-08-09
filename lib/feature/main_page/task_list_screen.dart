@@ -20,13 +20,7 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreenState extends State<TaskListScreen> {
-  late NavigationService navigationService;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    navigationService = context.read<NavigationService>();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +30,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            navigationService.onTaskScreen();
+            context.read<NavigationService>().onTaskScreen();
           },
         ),
         body: SafeArea(
@@ -89,7 +83,11 @@ class _TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<_TaskListPage> {
   TextEditingController textEditingController = TextEditingController();
-
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -159,13 +157,9 @@ class _Item extends StatefulWidget {
 
 class _ItemState extends State<_Item> {
   var leftIconPadding = 27.0;
-  late NavigationService navigationService;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    navigationService = context.read<NavigationService>();
-  }
+
+
 
   Future<bool?> dismissDirectionFunc(DismissDirection direction) async {
     if (direction == DismissDirection.startToEnd) {
@@ -326,7 +320,7 @@ class _ItemState extends State<_Item> {
               ),
               IconButton(
                 onPressed: () {
-                  navigationService.onTaskScreen(task: widget.task);
+                  context.read<NavigationService>().onTaskScreen(task: widget.task);
                 },
                 icon: Icon(
                   Icons.info_outline,

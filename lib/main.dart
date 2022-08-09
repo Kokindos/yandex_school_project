@@ -48,12 +48,6 @@ class _AppState extends State<App> {
           debugShowCheckedModeBanner: false,
           navigatorKey: navigationService.navigationKey,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          // localizationsDelegates: const [
-          //   GlobalMaterialLocalizations.delegate,
-          //   GlobalWidgetsLocalizations.delegate,
-          //   GlobalCupertinoLocalizations.delegate,
-          //   AppLocalizations.delegate(),
-          // ],
           supportedLocales: const [
             Locale('en'),
             Locale('ru'),

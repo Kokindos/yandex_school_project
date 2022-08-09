@@ -21,18 +21,14 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  late NavigationService navigationService;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    navigationService = context.read<NavigationService>();
-  }
+
 
   DateTime currentDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
+    final navigationService=context.read<NavigationService>();
     return BlocProvider(
       create: (context) => TaskEditBloc(
         context.read<TaskRepository>(),
