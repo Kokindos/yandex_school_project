@@ -220,10 +220,11 @@ class _ItemState extends State<_Item> {
       ),
       child: GestureDetector(
         onTap: () => context.read<TaskListBloc>().setDoneTask(widget.task),
-        child: Padding(
+        child: Container(
+          color: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Stack(
                 alignment: Alignment.center,
@@ -357,7 +358,7 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     return Material(
-      elevation: shrinkOffset < delta ? 0 : 5,
+      elevation: shrinkOffset < delta ? 0 : 4,
       child: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
         padding: EdgeInsets.only(
