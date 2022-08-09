@@ -1,5 +1,6 @@
 import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/services/navigation_service.dart';
+import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_repository.dart';
@@ -13,7 +14,6 @@ import 'package:done/feature/app/models/priority.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:done/feature/app/models/task.dart';
-
 
 class TaskScreen extends StatefulWidget {
   final Task? task;
@@ -127,7 +127,6 @@ class _TaskPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: ListView(
-
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
             const SizedBox(
@@ -146,6 +145,7 @@ class _TaskPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: TextFormField(
                   controller: textController,
+                  textInputAction: TextInputAction.go,
                   maxLines: null,
                   minLines: 4,
                   decoration: InputDecoration(
@@ -168,8 +168,8 @@ class _TaskPage extends StatelessWidget {
               children: [
                 Container(
                   width: 150,
-
-                  child: DropdownButton<Priority>(style: TextStyle(color: Theme.of(context).hintColor),
+                  child: DropdownButton<Priority>(
+                    style: TextStyle(color: Theme.of(context).hintColor),
                     borderRadius: BorderRadius.circular(2),
                     iconDisabledColor: Colors.transparent,
                     iconEnabledColor: Colors.transparent,
@@ -187,7 +187,9 @@ class _TaskPage extends StatelessWidget {
                         value: Priority.important,
                         child: Text(
                           AppLocalizations.of(context)!.high,
-                          style: const TextStyle(color: AppTheme.red),
+                          style: TextStyle(
+                              color:
+                                  context.read<RemoteConfigService>().getColor),
                         ),
                       ),
                     ],
@@ -198,8 +200,10 @@ class _TaskPage extends StatelessWidget {
                     },
                   ),
                 ),
+
               ],
             ),
+            const Divider(),
             const SizedBox(
               height: 16,
             ),
@@ -214,7 +218,7 @@ class _TaskPage extends StatelessWidget {
                       Text(AppLocalizations.of(context)!.doneUntil),
                       if (deadline != null)
                         Text(
-                          DateFormat('d MMMM y').format(
+                          DateFormat('d MMMM y',AppLocalizations.of(context)?.localeName).format(
                               DateTime.fromMicrosecondsSinceEpoch(deadline!)),
                           style:
                               TextStyle(color: Theme.of(context).primaryColor),
@@ -269,33 +273,33 @@ class _TaskPage extends StatelessWidget {
                         ),
                       )
                     : InkWell(
-                  onTap: () {
-                    context.read<TaskEditBloc>().deleteTask();
-                    navigationService.onPop();
-                  },
-                  child: Container(
-                    width: 112,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 4,
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.delete,
-                          color: AppTheme.red,
+                        onTap: () {
+                          context.read<TaskEditBloc>().deleteTask();
+                          navigationService.onPop();
+                        },
+                        child: Container(
+                          width: 112,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 4,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.delete,
+                                color: AppTheme.red,
+                              ),
+                              const SizedBox(
+                                width: 17,
+                              ),
+                              Text(
+                                AppLocalizations.of(context)!.delete,
+                                style: const TextStyle(color: AppTheme.red),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(
-                          width: 17,
-                        ),
-                        Text(
-                          AppLocalizations.of(context)!.delete,
-                          style: const TextStyle(color: AppTheme.red),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+                      );
               },
             ),
           ],

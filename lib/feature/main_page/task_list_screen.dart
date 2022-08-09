@@ -1,6 +1,7 @@
 import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/di/di_container.dart';
 import 'package:done/common/services/navigation_service.dart';
+import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/feature/main_page/bloc/task_list_bloc.dart';
 import 'package:done/feature/main_page/bloc/task_list_state.dart';
 import 'package:flutter/material.dart';
@@ -211,101 +212,116 @@ class _ItemState extends State<_Item> {
           ],
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(alignment: Alignment.center, children: [
-              if (widget.task.importance == Priority.important)
-                Container(
-                  height: 15,
-                  width: 15,
-                  color: AppTheme.red.withOpacity(.2),
+      child: GestureDetector(
+        onTap: () => context.read<TaskListBloc>().setDoneTask(widget.task),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(alignment: Alignment.center, children: [
+                if (widget.task.importance == Priority.important)
+                  Container(
+                    height: 15,
+                    width: 15,
+                    color: context
+                        .read<RemoteConfigService>()
+                        .getColor
+                        .withOpacity(.2),
+                  ),
+                Checkbox(
+                  value: widget.task.done,
+                  onChanged: (value) {
+                    context.read<TaskListBloc>().setDoneTask(widget.task);
+                  },
+                  activeColor: AppTheme.green,
+                  side: BorderSide(
+                      width: 2,
+                      color: widget.task.importance == Priority.important
+                          ? context.read<RemoteConfigService>().getColor
+                          : Theme.of(context).dividerColor),
                 ),
-              Checkbox(
-                value: widget.task.done,
-                onChanged: (value) {
-                  context.read<TaskListBloc>().setDoneTask(widget.task);
-                },
-                activeColor: AppTheme.green,
-                side: BorderSide(
-                    width: 2,
-                    color: widget.task.importance == Priority.important
-                        ? AppTheme.red
-                        : Theme.of(context).dividerColor),
+              ]),
+              const SizedBox(
+                width: 15,
               ),
-            ]),
-            const SizedBox(
-              width: 15,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (widget.task.done == true)
-                      Text(
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        widget.task.text,
-                        style: Theme.of(context).textTheme.overline,
-                      )
-                    else
-                      Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (widget.task.importance != Priority.basic)
-                              if (widget.task.importance == Priority.low)
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(right: 6, top: 3),
-                                  child: SvgPicture.asset(
-                                    'lib/assets/icons/icon_low.svg',
-                                    allowDrawingOutsideViewBox: true,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.task.done == true)
+                        Text(
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          widget.task.text,
+                          style: Theme.of(context).textTheme.overline,
+                        )
+                      else
+                        Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (widget.task.importance != Priority.basic)
+                                if (widget.task.importance == Priority.low)
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(right: 6, top: 3),
+                                    child: SvgPicture.asset(
+                                      'lib/assets/icons/icon_low.svg',
+                                      allowDrawingOutsideViewBox: true,
+                                    ),
+                                  )
+                                else
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 6),
+                                    child: SvgPicture.asset(
+                                      'lib/assets/icons/icon_important.svg',
+                                      color: context
+                                          .read<RemoteConfigService>()
+                                          .getColor,
+                                      allowDrawingOutsideViewBox: true,
+                                    ),
                                   ),
-                                )
-                              else
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 6),
-                                  child: SvgPicture.asset(
-                                    'lib/assets/icons/icon_important.svg',
-                                    allowDrawingOutsideViewBox: true,
-                                  ),
-                                ),
-                            Text(
-                              widget.task.text,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ]),
-                    if (widget.task.deadline != null)
-                      Text(
-                        DateFormat('d MMMM y').format(
-                          DateTime.fromMicrosecondsSinceEpoch(
-                              widget.task.deadline!),
+                              Text(
+                                widget.task.text,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ]),
+                      if (widget.task.deadline != null)
+                        Text(
+                          DateFormat('d MMMM y').format(
+                            DateTime.fromMicrosecondsSinceEpoch(
+                                widget.task.deadline!),
+                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2!
+                              .copyWith(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .overline!
+                                      .color),
                         ),
-                        style: Theme.of(context).textTheme.subtitle2!.copyWith(
-                            color: Theme.of(context).textTheme.overline!.color),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              width: 14,
-            ),
-            IconButton(
-              onPressed: () {
-                navigationService.onTaskScreen(task: widget.task);
-              },
-              icon: Icon(
-                Icons.info_outline,
-                color: Colors.black.withOpacity(.3),
+              const SizedBox(
+                width: 14,
               ),
-            ),
-          ],
+              IconButton(
+                onPressed: () {
+                  navigationService.onTaskScreen(task: widget.task);
+                },
+                icon: Icon(
+                  Icons.info_outline,
+                  color: Colors.black.withOpacity(.3),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
