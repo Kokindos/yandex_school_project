@@ -11,7 +11,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import 'package:done/feature/app/models/task.dart';
 
 
