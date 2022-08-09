@@ -117,6 +117,7 @@ class _TaskListPageState extends State<_TaskListPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 36),
                       child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.done,
                         controller: textEditingController,
                         onSubmitted: (value) => context

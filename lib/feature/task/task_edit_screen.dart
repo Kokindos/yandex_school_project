@@ -135,6 +135,7 @@ class _TaskPage extends StatelessWidget {
                 shadowColor: Colors.black54,
                 borderRadius: BorderRadius.circular(8),
                 child: TextFormField(
+                  textCapitalization: TextCapitalization.sentences,
                   controller: textController,
                   textInputAction: TextInputAction.go,
                   maxLines: null,
