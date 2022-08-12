@@ -1,15 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:done/feature/app/models/response/task_response.dart';
 import 'package:done/feature/app/models/task.dart';
+import 'package:done/task_api.dart';
 
 import '../models/response/list_response.dart';
 
-class NetworkTaskBackend {
+class NetworkTaskBackend implements TaskApi {
   final Dio _client;
 
   NetworkTaskBackend(this._client);
-
-  Future<TaskResponse> createTask(
+  @override
+  Future<Task> createTask(
       {required Task task, required int revision}) async {
     final response = await _client.post(
       '/list',
@@ -20,28 +21,32 @@ class NetworkTaskBackend {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
-    return TaskResponse.fromJson(response.data);
+    return TaskResponse.fromJson(response.data).element;
+  }
+  @override
+  Future<List<Task>> getList() async {
+    final response = await _client.get('/list');
+    return ListResponse.fromJson(response.data).list;
   }
 
-  Future<ListResponse> getList() async {
+  Future<ListResponse> getRevision() async{
     final response = await _client.get('/list');
     return ListResponse.fromJson(response.data);
   }
-
-  Future<ListResponse> updateList({required ListResponse taskList}) async {
+  @override
+  Future<List<Task>> updateList({required List<Task> taskList,int? revision}) async {
     final response = await _client.patch(
       '/list',
-      data: {"list": taskList.list.map((e) => e.toJson()).toList()},
+      data: {"list": taskList.map((e) => e.toJson()).toList()},
       options: Options(
-        headers: {'X-Last-Known-Revision': taskList.revision},
+        headers: {'X-Last-Known-Revision': revision!},
       ),
     );
-    return ListResponse.fromJson(response.data);
+    return ListResponse.fromJson(response.data).list;
   }
-
-  Future<TaskResponse> editTask(
+  @override
+  Future<Task> editTask(
       {required Task task, required int revision}) async {
-    //print('${task.id}');
     final response = await _client.put(
       '/list/${task.id}',
       data: {
@@ -51,10 +56,10 @@ class NetworkTaskBackend {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
-    return TaskResponse.fromJson(response.data);
+    return TaskResponse.fromJson(response.data).element;
   }
-
-  Future<TaskResponse> deleteTask(
+  @override
+  Future<Task> deleteTask(
       {required int revision, required String id}) async {
     final response = await _client.delete(
       '/list/$id',
@@ -62,10 +67,10 @@ class NetworkTaskBackend {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
-    return TaskResponse.fromJson(response.data);
+    return TaskResponse.fromJson(response.data).element;
   }
-
-  Future<TaskResponse> getTask(
+  @override
+  Future<Task> getTask(
       {required int revision, required String id}) async {
     final response = await _client.get(
       '/list/$id',
@@ -73,6 +78,6 @@ class NetworkTaskBackend {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
-    return TaskResponse.fromJson(response.data);
+    return TaskResponse.fromJson(response.data).element;
   }
 }

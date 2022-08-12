@@ -20,7 +20,7 @@ class TaskRepository {
   Future<void> getTasks() async {
     try {
       final response = await _networkTaskBackend.getList();
-      _taskListStreamController.add(response.list);
+      _taskListStreamController.add(response);
     } catch (e) {
       showSimpleNotification(
          const Text('Неизвестная ошибка'),
@@ -32,12 +32,12 @@ class TaskRepository {
 
   void createTask({required Task task}) async {
     try {
-      final tasklist = await _networkTaskBackend.getList();
+      final tasklist = await _networkTaskBackend.getRevision();
       final createdtask = await _networkTaskBackend.createTask(
           task: task, revision: tasklist.revision);
 
      _taskListStreamController.add(
-       tasklist.list.toList()..add(createdtask.element),
+       tasklist.list.toList()..add(createdtask),
       );
     } on DioError catch (_) {
       showSimpleNotification(
@@ -56,7 +56,7 @@ class TaskRepository {
 
   void deleteTask({required String id}) async {
     try {
-      final response = await _networkTaskBackend.getList();
+      final response = await _networkTaskBackend.getRevision();
       _networkTaskBackend.deleteTask(revision: response.revision, id: id);
       List<Task> tasklist=response.list.toList();
       tasklist.removeWhere((element) => element.id==id);
@@ -79,7 +79,7 @@ class TaskRepository {
 
   void editTask({required Task task}) async {
     try {
-      final response = await _networkTaskBackend.getList();
+      final response = await _networkTaskBackend.getRevision();
       _networkTaskBackend.editTask(task: task, revision: response.revision);
       List<Task> tasklist=response.list.toList();
       for (int i = 0; i < tasklist.length; i++) {
