@@ -1,42 +1,56 @@
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/task_api.dart';
+import 'package:hive/hive.dart';
 
 class LocalStorageApi implements TaskApi{
 
   @override
-  Future<Task> createTask({required Task task, required int revision}) {
-    // TODO: implement createTask
-    throw UnimplementedError();
+  Future<Task> createTask({required Task task, required int revision}) async{
+    final box=await Hive.openBox('tasks');
+    await box.put(task.id, task);
+    await box.close();
+    return task;
   }
 
   @override
-  Future<Task> deleteTask({required int revision, required String id}) {
-    // TODO: implement deleteTask
-    throw UnimplementedError();
+  Future<Task> deleteTask({required int revision, required String id}) async{
+    final box=await Hive.openBox('tasks');
+    Task task=await box.get(id);
+    await box.delete(id);
+    await box.close();
+    return task;
   }
 
   @override
-  Future<Task> editTask({required Task task, required int revision}) {
-    // TODO: implement editTask
-    throw UnimplementedError();
+  Future<Task> editTask({required Task task, required int revision}) async {
+    final box=await Hive.openBox('tasks');
+    await box.put(task.id, task);
+    await box.close();
+    return task;
   }
 
   @override
-  Future<List<Task>> getList() {
-    // TODO: implement getList
-    throw UnimplementedError();
+  Future<List<Task>> getList() async {
+    final box=await Hive.openBox('tasks');
+    List<Task> tasklist=await box.get('tasks');
+    await box.close();
+    return tasklist;
   }
 
   @override
-  Future<Task> getTask({required int revision, required String id}) {
-    // TODO: implement getTask
-    throw UnimplementedError();
+  Future<Task> getTask({required int revision, required String id}) async {
+    final box=await Hive.openBox('tasks');
+    Task task= await box.get(id);
+    await box.close();
+    return task;
   }
 
   @override
-  Future<List<Task>> updateList({required List<Task> taskList, int? revision}) {
-    // TODO: implement updateList
-    throw UnimplementedError();
+  Future<List<Task>> updateList({required List<Task> taskList, int? revision}) async {
+    final box=await Hive.openBox('tasks');
+    List<Task> tasklist=await box.get('tasks');
+    await box.close();
+    return tasklist;
   }
 
 }
