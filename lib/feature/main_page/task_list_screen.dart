@@ -187,9 +187,9 @@ class _ItemState extends State<_Item> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Icon(
+            const Icon(
               Icons.delete,
-              color: Theme.of(context).backgroundColor,
+              color: Colors.white,
             ),
             SizedBox(
               width: leftIconPadding,
@@ -205,9 +205,9 @@ class _ItemState extends State<_Item> {
             SizedBox(
               width: leftIconPadding,
             ),
-            Icon(
+            const Icon(
               Icons.done,
-              color: Theme.of(context).backgroundColor,
+              color: Colors.white,
             ),
           ],
         ),
@@ -325,7 +325,7 @@ class _ItemState extends State<_Item> {
                 },
                 icon: Icon(
                   Icons.info_outline,
-                  color: Colors.black.withOpacity(.3),
+                  color: Theme.of(context).hintColor,
                 ),
               ),
             ],
