@@ -8,7 +8,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -17,7 +19,8 @@ void main() async {
   await Firebase.initializeApp();
 
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
+  final appDocumentDir = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDir.path);
 
   runApp(
     const App(),

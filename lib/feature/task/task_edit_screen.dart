@@ -5,7 +5,7 @@ import 'package:done/common/services/navigation_service.dart';
 import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
-import 'package:done/feature/app/repositories/task_repository.dart';
+import 'package:done/feature/app/repositories/task_network_repository.dart';
 import 'package:done/feature/task/bloc/task_edit_bloc.dart';
 import 'package:done/feature/task/bloc/task_edit_state.dart';
 import 'package:flutter/material.dart';
