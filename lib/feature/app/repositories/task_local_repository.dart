@@ -1,6 +1,7 @@
 import 'package:done/feature/app/models/task.dart';
-import 'package:done/feature/app/network/local_storage_api.dart';
 import 'package:done/feature/app/repositories/task_repository.dart';
+
+import '../task_api/local_storage_api.dart';
 
 class TaskLocalRepository implements TaskRepository{
   TaskLocalRepository(this._localStorageApi);
@@ -31,7 +32,6 @@ class TaskLocalRepository implements TaskRepository{
     return _localStorageApi.getTask(id: id);
   }
 
-  @override
   Future<List<Task>> updateList({required List<Task> taskList}) {
     return _localStorageApi.updateList(taskList: taskList);
   }

@@ -2,8 +2,7 @@ import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/di/di_container.dart';
 import 'package:done/common/services/navigation_service.dart';
 import 'package:done/common/services/remote_config_service.dart';
-import 'package:done/feature/main_page/bloc/task_list_bloc.dart';
-import 'package:done/feature/main_page/bloc/task_list_state.dart';
+import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -12,20 +11,15 @@ import 'package:intl/intl.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 
-class TaskListScreen extends StatefulWidget {
+class TaskListScreen extends StatelessWidget {
   const TaskListScreen({Key? key}) : super(key: key);
-
-  @override
-  State<TaskListScreen> createState() => _TaskListScreenState();
-}
-
-class _TaskListScreenState extends State<TaskListScreen> {
-
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => TaskListBloc(DIContainer.instance.taskRepository),
+      create: (_) =>
+          TaskListBloc(taskRepository: DIContainer.instance.taskRepository)
+            ..add(GetListEvent()),
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
@@ -35,31 +29,27 @@ class _TaskListScreenState extends State<TaskListScreen> {
         ),
         body: SafeArea(
           child: Container(
-            padding: const EdgeInsets.only(
-              left: 8,
-              right: 8,
-            ),
-            child: BlocBuilder<TaskListBloc, TaskListState>(
-              builder: (context, state) {
-                return state.when(
-                  loaded:
-                      (tasks, visibledTasks, doneTasksCounter, showDoneTasks) {
+              padding: const EdgeInsets.only(
+                left: 8,
+                right: 8,
+              ),
+              child: BlocBuilder<TaskListBloc, TaskListState>(
+                builder: (context, state) {
+                  if (state is TaskListLoadedState) {
                     return _TaskListPage(
-                      tasks: showDoneTasks ? tasks : visibledTasks,
-                      doneTasksCounter: doneTasksCounter,
-                      showDoneTasks: showDoneTasks,
+                      tasks: state.tasks,
                     );
-                  },
-                  error: (message, __) => Center(
-                    child: Text('Error: $message'),
-                  ),
-                  loading: (_) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              },
-            ),
-          ),
+                  } else if (state is TaskListErrorState) {
+                    return Center(
+                      child: Text('$state.message'),
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              )),
         ),
       ),
     );
@@ -69,13 +59,9 @@ class _TaskListScreenState extends State<TaskListScreen> {
 class _TaskListPage extends StatefulWidget {
   const _TaskListPage({
     required this.tasks,
-    required this.doneTasksCounter,
-    required this.showDoneTasks,
   });
 
   final List<Task> tasks;
-  final int doneTasksCounter;
-  final bool showDoneTasks;
 
   @override
   State<_TaskListPage> createState() => _TaskListPageState();
@@ -83,17 +69,19 @@ class _TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<_TaskListPage> {
   TextEditingController textEditingController = TextEditingController();
+
   @override
   void dispose() {
     textEditingController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
         SliverPersistentHeader(
-          delegate: _AppBarDelegate(doneTasksCounter: widget.doneTasksCounter),
+          delegate: _AppBarDelegate(doneTasksCounter: widget.tasks.where((element) => element.done==true).length),
           pinned: true,
           floating: true,
         ),
@@ -112,16 +100,17 @@ class _TaskListPageState extends State<_TaskListPage> {
                 child: Column(
                   children: [
                     for (var task in widget.tasks) _Item(task: task),
+                    //TODO: вынести в функцию
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 36),
                       child: TextField(
                         textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.done,
                         controller: textEditingController,
-                        onSubmitted: (value) => context
-                            .read<TaskListBloc>()
-                            .createQuickTask(
-                                textController: textEditingController),
+                        onSubmitted: (value) =>
+                            BlocProvider.of<TaskListBloc>(context).add(
+                          CreateTaskEvent(textEditingController.text),
+                        ),
                         maxLines: null,
                         minLines: 1,
                         keyboardType: TextInputType.multiline,
@@ -158,15 +147,16 @@ class _Item extends StatefulWidget {
 class _ItemState extends State<_Item> {
   var leftIconPadding = 27.0;
 
-
-
-
   Future<bool?> dismissDirectionFunc(DismissDirection direction) async {
     if (direction == DismissDirection.startToEnd) {
-      context.read<TaskListBloc>().setDoneTask(widget.task);
+      BlocProvider.of<TaskListBloc>(context).add(
+        EditTaskEvent(
+          widget.task.copyWith(done: !widget.task.done),
+        ),
+      );
       return false;
     } else {
-      context.read<TaskListBloc>().deleteTask(widget.task);
+      BlocProvider.of<TaskListBloc>(context).add(DeleteTaskEvent(widget.task));
       return true;
     }
   }
@@ -213,7 +203,11 @@ class _ItemState extends State<_Item> {
         ),
       ),
       child: GestureDetector(
-        onTap: () => context.read<TaskListBloc>().setDoneTask(widget.task),
+        onTap: () => BlocProvider.of<TaskListBloc>(context).add(
+          EditTaskEvent(
+            widget.task.copyWith(done: !widget.task.done),
+          ),
+        ),
         child: Container(
           color: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -235,7 +229,11 @@ class _ItemState extends State<_Item> {
                   Checkbox(
                     value: widget.task.done,
                     onChanged: (value) {
-                      context.read<TaskListBloc>().setDoneTask(widget.task);
+                      BlocProvider.of<TaskListBloc>(context).add(
+                        EditTaskEvent(
+                          widget.task.copyWith(done: !widget.task.done),
+                        ),
+                      );
                     },
                     activeColor: AppTheme.green,
                     side: BorderSide(
@@ -321,7 +319,9 @@ class _ItemState extends State<_Item> {
               ),
               IconButton(
                 onPressed: () {
-                  context.read<NavigationService>().onTaskScreen(task: widget.task);
+                  context
+                      .read<NavigationService>()
+                      .onTaskScreen(task: widget.task);
                 },
                 icon: Icon(
                   Icons.info_outline,
@@ -411,7 +411,6 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
     if (oldDelegate != this) {
       return true;
     }
-
     return false;
   }
 }
@@ -422,24 +421,20 @@ class _HideButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TaskListBloc, TaskListState>(builder: (context, state) {
-      return state.when(
-        loaded: (_, visibledTasks, doneTasksCounter, showDoneTasks) {
-          return Container(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              onPressed: () {
-                context.read<TaskListBloc>().switchListVisibility();
-              },
-              icon: showDoneTasks
-                  ? const Icon(Icons.visibility)
-                  : const Icon(Icons.visibility_off),
-              color: Theme.of(context).primaryColor,
-            ),
-          );
-        },
-        error: (message, __) => Container(),
-        loading: (_) => Container(),
-      );
+      if (state is TaskListLoadedState) {
+        return Container(
+          padding: const EdgeInsets.only(right: 16),
+          child: IconButton(
+            onPressed: () {},
+            icon: true
+                ? const Icon(Icons.visibility)
+                : const Icon(Icons.visibility_off),
+            color: Theme.of(context).primaryColor,
+          ),
+        );
+      } else {
+        return Container();
+      }
     });
   }
 }

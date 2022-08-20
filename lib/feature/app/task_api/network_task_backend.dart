@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:done/feature/app/models/response/task_response.dart';
 import 'package:done/feature/app/models/task.dart';
-import 'package:done/task_api.dart';
 
 import '../models/response/list_response.dart';
+import 'task_api.dart';
 
 class NetworkTaskBackend implements TaskApi {
   final Dio _client;
