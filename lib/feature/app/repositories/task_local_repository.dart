@@ -5,7 +5,7 @@ import '../task_api/local_storage_api.dart';
 
 class TaskLocalRepository implements TaskRepository{
   TaskLocalRepository(this._localStorageApi);
-  LocalStorageApi _localStorageApi;
+  final LocalStorageApi _localStorageApi;
 
   @override
   Future<Task> createTask({required Task task}) async{

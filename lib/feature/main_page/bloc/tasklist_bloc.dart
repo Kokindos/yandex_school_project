@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:done/feature/app/models/priority.dart';
@@ -16,6 +16,8 @@ part 'tasklist_event.dart';
 
 part 'tasklist_state.dart';
 
+part 'tasklist_bloc.freezed.dart';
+
 class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   //final TaskConnectRepository _taskRepository;
   final TaskNetworkRepository _taskRepository;
@@ -23,7 +25,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   TaskListBloc({
     required TaskNetworkRepository taskRepository,
   })  : _taskRepository = taskRepository,
-        super(TaskListLoadingState()) {
+        super(const TaskListState.loading()) {
     on<GetListEvent>(_onGetList);
     on<DeleteTaskEvent>(_onDelete);
     on<CreateTaskEvent>(_onCreate);
@@ -47,33 +49,29 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   Future<void> _onEdit(EditTaskEvent event, Emitter<TaskListState> emit) async {
-    log(event.task.toString());
     try {
       final task = event.task.copyWith(
         changedAt: DateTime.now().microsecondsSinceEpoch,
         lastUpdatedBy: await getDeviceInfo(),
       );
       await _taskRepository.editTask(task: task);
-      final _state = state;
-      if (_state is TaskListLoadedState) {
-        for (int i = 0; i < _state.tasks.length; i++) {
-          if (_state.tasks[i].id == event.task.id) {
-            _state.tasks[i] = task;
+      if (state is TaskListLoadedState) {
+        final currentState = state as TaskListLoadedState;
+        final List<Task> newTasks = List.from(currentState.tasks);
+        for (int i = 0; i < newTasks.length; i++) {
+          if (newTasks[i].id == event.task.id) {
+            newTasks[i] = task;
             break;
           }
         }
         emit(
-          TaskListLoadedState(
-            tasks: _state.tasks,
+          TaskListState.loaded(
+            tasks: newTasks,
           ),
         );
       }
     } catch (e) {
-      emit(
-        TaskListErrorState(
-          e.toString(),
-        ),
-      );
+      emit(TaskListState.error(message: e.toString()));
       rethrow;
     }
   }
@@ -92,22 +90,19 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
     );
     try {
       await _taskRepository.createTask(task: task);
-      final _state = state;
-      if (_state is TaskListLoadedState) {
-        _state.tasks.add(task);
+      if (state is TaskListLoadedState) {
+        final currentState=state as TaskListLoadedState;
+        final List<Task> newTasks= List.from(currentState.tasks);
+        newTasks.add(task);
 
         emit(
-          TaskListLoadedState(
-            tasks: _state.tasks,
+          TaskListState.loaded(
+            tasks: newTasks,
           ),
         );
       }
     } catch (e) {
-      emit(
-        TaskListErrorState(
-          e.toString(),
-        ),
-      );
+      emit(TaskListState.error(message: e.toString()));
     }
   }
 
@@ -115,35 +110,42 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
       DeleteTaskEvent event, Emitter<TaskListState> emit) async {
     try {
       await _taskRepository.deleteTask(id: event.task.id);
-      final _state = state;
-      if (_state is TaskListLoadedState) {
-        _state.tasks.remove(event.task);
+      if (state is TaskListLoadedState) {
+        final currentState = state as TaskListLoadedState;
+        final List<Task> newTasks = List.from(currentState.tasks);
+        newTasks.remove(event.task);
 
         emit(
-          TaskListLoadedState(
-            tasks: _state.tasks,
+          TaskListState.loaded(
+            tasks: newTasks,
           ),
         );
       }
     } catch (e) {
       emit(
-        TaskListErrorState(
-          e.toString(),
+        TaskListState.error(
+          message: e.toString(),
         ),
       );
-
     }
   }
 
   Future<void> _onGetList(
       GetListEvent event, Emitter<TaskListState> emit) async {
-    emit(TaskListLoadingState());
+    emit(
+      const TaskListState.loading(),
+    );
     try {
       final response = await _taskRepository.getList();
-      emit(TaskListLoadedState(tasks: response));
+      emit(
+        TaskListState.loaded(tasks: response),
+      );
     } catch (e) {
-      log(e.toString());
-      emit(TaskListErrorState(e.toString()));
+      emit(
+        TaskListState.error(
+          message: e.toString(),
+        ),
+      );
       rethrow;
     }
   }

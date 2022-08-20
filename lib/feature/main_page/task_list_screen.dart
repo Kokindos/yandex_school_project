@@ -150,13 +150,13 @@ class _ItemState extends State<_Item> {
   Future<bool?> dismissDirectionFunc(DismissDirection direction) async {
     if (direction == DismissDirection.startToEnd) {
       BlocProvider.of<TaskListBloc>(context).add(
-        EditTaskEvent(
+        EditTaskEvent(task:
           widget.task.copyWith(done: !widget.task.done),
         ),
       );
       return false;
     } else {
-      BlocProvider.of<TaskListBloc>(context).add(DeleteTaskEvent(widget.task));
+      BlocProvider.of<TaskListBloc>(context).add(DeleteTaskEvent(task: widget.task));
       return true;
     }
   }
@@ -204,7 +204,7 @@ class _ItemState extends State<_Item> {
       ),
       child: GestureDetector(
         onTap: () => BlocProvider.of<TaskListBloc>(context).add(
-          EditTaskEvent(
+          EditTaskEvent(task:
             widget.task.copyWith(done: !widget.task.done),
           ),
         ),
@@ -230,7 +230,7 @@ class _ItemState extends State<_Item> {
                     value: widget.task.done,
                     onChanged: (value) {
                       BlocProvider.of<TaskListBloc>(context).add(
-                        EditTaskEvent(
+                        EditTaskEvent(task:
                           widget.task.copyWith(done: !widget.task.done),
                         ),
                       );
