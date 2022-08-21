@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/di/di_container.dart';
 import 'package:done/common/services/navigation_service.dart';
@@ -16,11 +18,8 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          TaskListBloc(taskRepository: DIContainer.instance.taskRepository)
-            ..add(GetListEvent()),
-      child: Scaffold(
+    //TODO: animatedlist
+    return Scaffold(
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
@@ -40,8 +39,9 @@ class TaskListScreen extends StatelessWidget {
                       tasks: state.tasks,
                     );
                   } else if (state is TaskListErrorState) {
-                    return Center(
-                      child: Text('$state.message'),
+                    return Center( //SnackBar
+
+                    child: Text('$state.message'),
                     );
                   } else {
                     return const Center(
@@ -51,7 +51,6 @@ class TaskListScreen extends StatelessWidget {
                 },
               )),
         ),
-      ),
     );
   }
 }
@@ -69,6 +68,7 @@ class _TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<_TaskListPage> {
   TextEditingController textEditingController = TextEditingController();
+  bool showDoneTasks=false;
 
   @override
   void dispose() {
@@ -76,12 +76,28 @@ class _TaskListPageState extends State<_TaskListPage> {
     super.dispose();
   }
 
+  List<Task> showFilteredList({required bool showDoneTasks}) {
+    setState(() {
+      this.showDoneTasks = showDoneTasks;
+    });
+    log(showDoneTasks.toString());
+    if (showDoneTasks) {
+      return widget.tasks;
+    } else {
+      return widget.tasks.where((element) => element.done == false).toList();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
         SliverPersistentHeader(
-          delegate: _AppBarDelegate(doneTasksCounter: widget.tasks.where((element) => element.done==true).length),
+          delegate: _AppBarDelegate(
+              doneTasksCounter:
+                  widget.tasks.where((element) => element.done == true).length,
+              showDoneTasks: showDoneTasks,
+              callback: (value) => showFilteredList(showDoneTasks: value)),
           pinned: true,
           floating: true,
         ),
@@ -99,8 +115,9 @@ class _TaskListPageState extends State<_TaskListPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 7),
                 child: Column(
                   children: [
-                    for (var task in widget.tasks) _Item(task: task),
-                    //TODO: вынести в функцию
+                    for (var task in showFilteredList(
+                        showDoneTasks: showDoneTasks))
+                      _Item(task: task),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 36),
                       child: TextField(
@@ -150,13 +167,14 @@ class _ItemState extends State<_Item> {
   Future<bool?> dismissDirectionFunc(DismissDirection direction) async {
     if (direction == DismissDirection.startToEnd) {
       BlocProvider.of<TaskListBloc>(context).add(
-        EditTaskEvent(task:
-          widget.task.copyWith(done: !widget.task.done),
+        EditTaskEvent(
+          task: widget.task.copyWith(done: !widget.task.done),
         ),
       );
       return false;
     } else {
-      BlocProvider.of<TaskListBloc>(context).add(DeleteTaskEvent(task: widget.task));
+      BlocProvider.of<TaskListBloc>(context)
+          .add(DeleteTaskEvent(task: widget.task));
       return true;
     }
   }
@@ -204,8 +222,8 @@ class _ItemState extends State<_Item> {
       ),
       child: GestureDetector(
         onTap: () => BlocProvider.of<TaskListBloc>(context).add(
-          EditTaskEvent(task:
-            widget.task.copyWith(done: !widget.task.done),
+          EditTaskEvent(
+            task: widget.task.copyWith(done: !widget.task.done),
           ),
         ),
         child: Container(
@@ -230,8 +248,8 @@ class _ItemState extends State<_Item> {
                     value: widget.task.done,
                     onChanged: (value) {
                       BlocProvider.of<TaskListBloc>(context).add(
-                        EditTaskEvent(task:
-                          widget.task.copyWith(done: !widget.task.done),
+                        EditTaskEvent(
+                          task: widget.task.copyWith(done: !widget.task.done),
                         ),
                       );
                     },
@@ -341,9 +359,13 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
 
   _AppBarDelegate({
     required this.doneTasksCounter,
+    required this.showDoneTasks,
+    required this.callback,
   });
 
   final int doneTasksCounter;
+  final bool showDoneTasks;
+  final Function(bool showDoneTasks) callback;
 
   @override
   Widget build(
@@ -371,7 +393,11 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
                       ? Theme.of(context).textTheme.headline1!
                       : Theme.of(context).textTheme.headline2!,
                 ),
-                if (shrinkOffset > delta) const _HideButton(),
+                if (shrinkOffset > delta)
+                  _HideButton(
+                    callback: callback,
+                    showDoneTasks: showDoneTasks,
+                  ),
               ],
             ),
             const SizedBox(
@@ -391,7 +417,10 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
                               .withOpacity(.3),
                         ),
                   ),
-                  const _HideButton(),
+                  _HideButton(
+                    callback: callback,
+                    showDoneTasks: showDoneTasks,
+                  ),
                 ],
               ),
           ],
@@ -416,25 +445,27 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class _HideButton extends StatelessWidget {
-  const _HideButton();
+  const _HideButton({required this.showDoneTasks, required this.callback});
+
+  final bool showDoneTasks;
+  final Function(bool showDoneTasks) callback;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TaskListBloc, TaskListState>(builder: (context, state) {
-      if (state is TaskListLoadedState) {
-        return Container(
-          padding: const EdgeInsets.only(right: 16),
-          child: IconButton(
-            onPressed: () {},
-            icon: true
-                ? const Icon(Icons.visibility)
-                : const Icon(Icons.visibility_off),
-            color: Theme.of(context).primaryColor,
-          ),
-        );
-      } else {
-        return Container();
-      }
-    });
+    //TODO: implement switch list visibility
+    {
+      return Container(
+        padding: const EdgeInsets.only(right: 16),
+        child: IconButton(
+          onPressed: () {
+            callback(!showDoneTasks);
+          },
+          icon: showDoneTasks
+              ? const Icon(Icons.visibility)
+              : const Icon(Icons.visibility_off),
+          color: Theme.of(context).primaryColor,
+        ),
+      );
+    }
   }
 }

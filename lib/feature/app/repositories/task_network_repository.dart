@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:done/common/services/shared_pref_service.dart';
+import 'package:done/common/services/revision_pref_service.dart';
 import 'package:done/feature/app/models/response/list_response.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_repository.dart';
@@ -12,7 +12,7 @@ import '../task_api/network_task_backend.dart';
 class TaskNetworkRepository implements TaskRepository {
   TaskNetworkRepository(this._networkTaskBackend);
 
-  final SharedPrefService sharedPrefService = SharedPrefService();
+  final RevisionPrefService sharedPrefService = RevisionPrefService();
 
   final NetworkTaskBackend _networkTaskBackend;
 

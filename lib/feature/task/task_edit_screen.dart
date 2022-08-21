@@ -6,12 +6,13 @@ import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_network_repository.dart';
-import 'package:done/feature/task/bloc/task_edit_bloc.dart';
-import 'package:done/feature/task/bloc/task_edit_state.dart';
+import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskScreen extends StatefulWidget {
   final Task? task;
@@ -28,69 +29,52 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     final navigationService = context.read<NavigationService>();
-    return BlocProvider(
-      create: (context) => TaskEditBloc(
-        context.read<TaskRepository>(),
-        task: widget.task,
-      ),
-      child: BlocBuilder<TaskEditBloc, TaskEditState>(
-        builder: (context, state) {
-          return state.when(
-            task: (textController, importance, deadline) => _TaskPage(
-              navigationService,
-              textController,
-              importance,
-              deadline,
-            ),
-            editingTask: (
-              _,
-              textController,
-              importance,
-              deadline,
-            ) =>
-                _TaskPage(
-              navigationService,
-              textController,
-              importance,
-              deadline,
-            ),
-          );
-        },
-      ),
-    );
+    return _TaskPage(navigationService, widget.task);
   }
 }
 
 class _TaskPage extends StatefulWidget {
-  const _TaskPage(
+  _TaskPage(
     this.navigationService,
-    this.textController,
-    this.importance,
-    this.deadline,
+    this.task,
   );
 
   final NavigationService navigationService;
-  final TextEditingController textController;
-  final Priority importance;
-  final int? deadline;
+
+  Task? task;
 
   @override
   State<_TaskPage> createState() => _TaskPageState();
 }
 
 class _TaskPageState extends State<_TaskPage> {
+  final TextEditingController textController = TextEditingController();
   var scrollOverflow = false;
+  late Task task;
+  late bool isNew;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final bloc = context.read<TaskEditBloc>();
+  @override
+  void initState() {
+    if (widget.task == null) {
+      task = const Task(
+          id: '1', text: '', done: false, importance: Priority.basic);
+      isNew = true;
+    } else {
+      task = widget.task!;
+      isNew = false;
+    }
+  }
+
+  Future<DateTime?> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(2022),
         lastDate: DateTime(2122));
-    if (pickedDate != null) {
-      bloc.changeDeadline(pickedDate);
-    }
+    setState(() {
+      task = task.copyWith(deadline: pickedDate?.microsecondsSinceEpoch);
+    });
+    return pickedDate;
   }
 
   @override
@@ -105,7 +89,10 @@ class _TaskPageState extends State<_TaskPage> {
         actions: [
           TextButton(
             onPressed: () {
-              context.read<TaskEditBloc>().saveTask();
+              BlocProvider.of<TaskListBloc>(context).add(isNew
+                  ? CreateTaskEvent(textController.text,
+                      deadline: task.deadline, importance: task.importance)
+                  : EditTaskEvent(task: task));
               widget.navigationService.onPop();
             },
             child: Text(
@@ -152,7 +139,7 @@ class _TaskPageState extends State<_TaskPage> {
                   borderRadius: BorderRadius.circular(8),
                   child: TextFormField(
                     textCapitalization: TextCapitalization.sentences,
-                    controller: widget.textController,
+                    controller: textController,
                     textInputAction: TextInputAction.go,
                     maxLines: null,
                     minLines: 4,
@@ -183,7 +170,7 @@ class _TaskPageState extends State<_TaskPage> {
                         borderRadius: BorderRadius.circular(2),
                         iconDisabledColor: Colors.transparent,
                         iconEnabledColor: Colors.transparent,
-                        value: widget.importance,
+                        value: task.importance,
                         items: [
                           DropdownMenuItem(
                             value: Priority.basic,
@@ -210,7 +197,13 @@ class _TaskPageState extends State<_TaskPage> {
                         ],
                         onChanged: (value) {
                           if (value != null) {
-                            context.read<TaskEditBloc>().changePriority(value);
+                            final newTask = task.copyWith(importance: value);
+                            BlocProvider.of<TaskListBloc>(context).add(
+                              EditTaskEvent(task: newTask),
+                            );
+                            setState(() {
+                              task = newTask;
+                            });
                           }
                         },
                       ),
@@ -231,12 +224,12 @@ class _TaskPageState extends State<_TaskPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(AppLocalizations.of(context)!.doneUntil),
-                        if (widget.deadline != null)
+                        if (task.deadline != null)
                           Text(
                             DateFormat('d MMMM y',
                                     AppLocalizations.of(context)?.localeName)
                                 .format(DateTime.fromMicrosecondsSinceEpoch(
-                                    widget.deadline!)),
+                                    task.deadline!)),
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor),
                           )
@@ -248,12 +241,16 @@ class _TaskPageState extends State<_TaskPage> {
                     ),
                   ),
                   Switch(
-                      value: widget.deadline != null,
+                      value: task.deadline != null,
                       onChanged: (value) {
                         if (value) {
                           _selectDate(context);
                         } else {
-                          context.read<TaskEditBloc>().changeDeadline(null);
+                          BlocProvider.of<TaskListBloc>(context).add(
+                            EditTaskEvent(
+                              task: task.copyWith(deadline: task.deadline),
+                            ),
+                          );
                         }
                       }),
                 ],
@@ -263,62 +260,59 @@ class _TaskPageState extends State<_TaskPage> {
               const SizedBox(
                 height: 15,
               ),
-              BlocBuilder<TaskEditBloc, TaskEditState>(
-                builder: (builder, state) {
-                  return state is TaskEditStateInitial
-                      ? Container(
-                          width: 112,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 4,
+              isNew
+                  ? Container(
+                      width: 112,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 4,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.delete,
+                            color: Theme.of(context).disabledColor,
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.delete,
-                                color: Theme.of(context).disabledColor,
-                              ),
-                              const SizedBox(
-                                width: 17,
-                              ),
-                              Text(
-                                AppLocalizations.of(context)!.delete,
-                                style: TextStyle(
-                                    color: Theme.of(context).disabledColor),
-                              ),
-                            ],
+                          const SizedBox(
+                            width: 17,
                           ),
-                        )
-                      : InkWell(
-                          onTap: () {
-                            context.read<TaskEditBloc>().deleteTask();
-                            widget.navigationService.onPop();
-                          },
-                          child: Container(
-                            width: 112,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 4,
-                              horizontal: 4,
+                          Text(
+                            AppLocalizations.of(context)!.delete,
+                            style: TextStyle(
+                                color: Theme.of(context).disabledColor),
+                          ),
+                        ],
+                      ),
+                    )
+                  : InkWell(
+                      onTap: () {
+                        BlocProvider.of<TaskListBloc>(context)
+                            .add(DeleteTaskEvent(task: task));
+                        widget.navigationService.onPop();
+                      },
+                      child: Container(
+                        width: 112,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 4,
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.delete,
+                              color: AppTheme.red,
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.delete,
-                                  color: AppTheme.red,
-                                ),
-                                const SizedBox(
-                                  width: 17,
-                                ),
-                                Text(
-                                  AppLocalizations.of(context)!.delete,
-                                  style: const TextStyle(color: AppTheme.red),
-                                ),
-                              ],
+                            const SizedBox(
+                              width: 17,
                             ),
-                          ),
-                        );
-                },
-              ),
+                            Text(
+                              AppLocalizations.of(context)!.delete,
+                              style: const TextStyle(color: AppTheme.red),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
             ],
           ),
         ),

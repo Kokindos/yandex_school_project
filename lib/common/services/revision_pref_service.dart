@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPrefService {
+class RevisionPrefService {
 
   Future<int> getRevision() async{
     final sharedPref=await SharedPreferences.getInstance();

@@ -1,4 +1,4 @@
-import 'package:done/common/services/shared_pref_service.dart';
+import 'package:done/common/services/revision_pref_service.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_local_repository.dart';
 import 'package:done/feature/app/repositories/task_network_repository.dart';
@@ -10,7 +10,7 @@ class TaskConnectRepository implements TaskRepository {
 
   final TaskLocalRepository taskLocalRepository;
   final TaskNetworkRepository taskNetworkRepository;
-  final SharedPrefService sharedPrefService = SharedPrefService();
+  final RevisionPrefService sharedPrefService = RevisionPrefService();
 
   @override
   Future<Task> createTask({required Task task}) {
