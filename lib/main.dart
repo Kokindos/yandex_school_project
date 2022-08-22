@@ -57,7 +57,7 @@ class _AppState extends State<App> {
       ],
       child: OverlaySupport.global(
         child: Consumer<ThemeProvider>(
-          builder: (context, ThemeProvider themeModel, child) {
+          builder: (context, ThemeProvider theme, child) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               navigatorKey: navigationService.navigationKey,
@@ -67,7 +67,7 @@ class _AppState extends State<App> {
                 Locale('ru'),
               ],
               theme:
-                  themeModel.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
+                  theme.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
               onGenerateRoute: AppRouter.generateRoute,
               home: const TaskListScreen(),
               //initialRoute: AppRouter.mainScreen,

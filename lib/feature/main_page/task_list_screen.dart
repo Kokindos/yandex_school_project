@@ -4,6 +4,8 @@ import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/di/di_container.dart';
 import 'package:done/common/services/navigation_service.dart';
 import 'package:done/common/services/remote_config_service.dart';
+import 'package:done/common/services/theme_pref_service.dart';
+import 'package:done/common/services/theme_provider.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +14,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
+import 'package:provider/provider.dart';
 
 class TaskListScreen extends StatelessWidget {
   const TaskListScreen({Key? key}) : super(key: key);
@@ -20,37 +23,38 @@ class TaskListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     //TODO: animatedlist
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            context.read<NavigationService>().onTaskScreen();
-          },
-        ),
-        body: SafeArea(
-          child: Container(
-              padding: const EdgeInsets.only(
-                left: 8,
-                right: 8,
-              ),
-              child: BlocBuilder<TaskListBloc, TaskListState>(
-                builder: (context, state) {
-                  if (state is TaskListLoadedState) {
-                    return _TaskListPage(
-                      tasks: state.tasks,
-                    );
-                  } else if (state is TaskListErrorState) {
-                    return Center( //SnackBar
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          context.read<NavigationService>().onTaskScreen();
+        },
+      ),
+      body: SafeArea(
+        child: Container(
+            padding: const EdgeInsets.only(
+              left: 8,
+              right: 8,
+            ),
+            child: BlocBuilder<TaskListBloc, TaskListState>(
+              builder: (context, state) {
+                if (state is TaskListLoadedState) {
+                  return _TaskListPage(
+                    tasks: state.tasks,
+                  );
+                } else if (state is TaskListErrorState) {
+                  return Center(
+                    //SnackBar
 
                     child: Text('$state.message'),
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
-              )),
-        ),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            )),
+      ),
     );
   }
 }
@@ -68,7 +72,7 @@ class _TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<_TaskListPage> {
   TextEditingController textEditingController = TextEditingController();
-  bool showDoneTasks=false;
+  bool showDoneTasks = true;
 
   @override
   void dispose() {
@@ -115,8 +119,8 @@ class _TaskListPageState extends State<_TaskListPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 7),
                 child: Column(
                   children: [
-                    for (var task in showFilteredList(
-                        showDoneTasks: showDoneTasks))
+                    for (var task
+                        in showFilteredList(showDoneTasks: showDoneTasks))
                       _Item(task: task),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 36),
@@ -124,10 +128,13 @@ class _TaskListPageState extends State<_TaskListPage> {
                         textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.done,
                         controller: textEditingController,
-                        onSubmitted: (value) =>
+                        onSubmitted: (value) {
+                          if (textEditingController.text != '') {
                             BlocProvider.of<TaskListBloc>(context).add(
-                          CreateTaskEvent(textEditingController.text),
-                        ),
+                                CreateTaskEvent(textEditingController.text));
+                            textEditingController.clear();
+                          }
+                        },
                         maxLines: null,
                         minLines: 1,
                         keyboardType: TextInputType.multiline,
@@ -386,6 +393,7 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   AppLocalizations.of(context)!.myTasks,
@@ -452,7 +460,6 @@ class _HideButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: implement switch list visibility
     {
       return Container(
         padding: const EdgeInsets.only(right: 16),

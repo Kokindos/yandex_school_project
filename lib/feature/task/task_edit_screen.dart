@@ -8,7 +8,6 @@ import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_network_repository.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -56,13 +55,22 @@ class _TaskPageState extends State<_TaskPage> {
   @override
   void initState() {
     if (widget.task == null) {
-      task = const Task(
-          id: '1', text: '', done: false, importance: Priority.basic);
+      task = Task(
+          id: const Uuid().v1(),
+          text: '',
+          done: false,
+          importance: Priority.basic);
       isNew = true;
     } else {
       task = widget.task!;
       isNew = false;
     }
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
   }
 
   Future<DateTime?> _selectDate(BuildContext context) async {
