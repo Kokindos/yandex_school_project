@@ -10,6 +10,11 @@ abstract class AppTheme {
   static const green = Color(0xFF34C759);
 
   static ThemeData get lightTheme => ThemeData(
+        colorScheme: const ColorScheme.light(
+          primary: _primaryColor,
+          onPrimary: Colors.white,
+          onSurface: _primaryTextColorLight,
+        ),
         disabledColor: const Color(0x26000000),
         inputDecorationTheme: const InputDecorationTheme(
           enabledBorder: OutlineInputBorder(
@@ -82,6 +87,14 @@ abstract class AppTheme {
       );
 
   static ThemeData get darkTheme => ThemeData(
+        floatingActionButtonTheme:
+            const FloatingActionButtonThemeData(backgroundColor: _primaryColor),
+        colorScheme: const ColorScheme.dark(
+          surface: _primaryColor,
+          primary: _primaryColor,
+          onPrimary: Colors.white,
+          onSurface: _primaryTextColorDark,
+        ),
         disabledColor: const Color(0x26FFFFFF),
         inputDecorationTheme: const InputDecorationTheme(
           enabledBorder: OutlineInputBorder(

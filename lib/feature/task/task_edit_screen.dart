@@ -47,7 +47,8 @@ class _TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<_TaskPage> {
-  late TextEditingController textController = TextEditingController(text: task.text);
+  late TextEditingController textController =
+      TextEditingController(text: task.text);
   var scrollOverflow = false;
   late Task task;
   late bool isNew;
@@ -97,6 +98,7 @@ class _TaskPageState extends State<_TaskPage> {
         actions: [
           TextButton(
             onPressed: () {
+              task = task.copyWith(text: textController.text);
               BlocProvider.of<TaskListBloc>(context).add(isNew
                   ? CreateTaskEvent(textController.text,
                       deadline: task.deadline, importance: task.importance)
@@ -146,7 +148,6 @@ class _TaskPageState extends State<_TaskPage> {
                   shadowColor: Colors.black54,
                   borderRadius: BorderRadius.circular(8),
                   child: TextFormField(
-
                     textCapitalization: TextCapitalization.sentences,
                     controller: textController,
                     textInputAction: TextInputAction.go,
@@ -160,8 +161,6 @@ class _TaskPageState extends State<_TaskPage> {
                       disabledBorder: border,
                       enabledBorder: border,
                       focusedBorder: border,
-
-
                     ),
                   ),
                 );
@@ -250,15 +249,17 @@ class _TaskPageState extends State<_TaskPage> {
                   ),
                   Switch(
                       value: task.deadline != null,
+                      activeColor: Theme.of(context).primaryColor,
                       onChanged: (value) {
                         if (value) {
                           _selectDate(context);
-                        }
-                        else {
-                          setState(() {
-                            value=!value;
-                            task=task.copyWith(deadline: null);
-                          });
+                        } else {
+                          setState(
+                            () {
+                              value = !value;
+                              task = task.copyWith(deadline: null);
+                            },
+                          );
                         }
                       }),
                 ],

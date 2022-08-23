@@ -54,7 +54,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         changedAt: DateTime.now().microsecondsSinceEpoch,
         lastUpdatedBy: await getDeviceInfo(),
       );
-      await _taskRepository.editTask(task: task);
       if (state is TaskListLoadedState) {
         final currentState = state as TaskListLoadedState;
         final List<Task> newTasks = List.from(currentState.tasks);
@@ -69,6 +68,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
             tasks: newTasks,
           ),
         );
+        await _taskRepository.editTask(task: task);
       }
     } catch (e) {
       emit(TaskListState.error(message: e.toString()));
@@ -89,7 +89,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
       lastUpdatedBy: await getDeviceInfo(),
     );
     try {
-      await _taskRepository.createTask(task: task);
       if (state is TaskListLoadedState) {
         final currentState=state as TaskListLoadedState;
         final List<Task> newTasks= List.from(currentState.tasks);
@@ -100,6 +99,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
             tasks: newTasks,
           ),
         );
+        await _taskRepository.createTask(task: task);
       }
     } catch (e) {
       emit(TaskListState.error(message: e.toString()));
@@ -109,7 +109,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   Future<void> _onDelete(
       DeleteTaskEvent event, Emitter<TaskListState> emit) async {
     try {
-      await _taskRepository.deleteTask(id: event.task.id);
       if (state is TaskListLoadedState) {
         final currentState = state as TaskListLoadedState;
         final List<Task> newTasks = List.from(currentState.tasks);
@@ -120,6 +119,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
             tasks: newTasks,
           ),
         );
+        await _taskRepository.deleteTask(id: event.task.id);
       }
     } catch (e) {
       emit(

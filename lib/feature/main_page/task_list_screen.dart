@@ -24,7 +24,10 @@ class TaskListScreen extends StatelessWidget {
     //TODO: animatedlist
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
         onPressed: () {
           context.read<NavigationService>().onTaskScreen();
         },

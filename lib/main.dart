@@ -66,8 +66,8 @@ class _AppState extends State<App> {
                 Locale('en'),
                 Locale('ru'),
               ],
-              theme:
-                  theme.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
+              theme: AppTheme.darkTheme,
+              //theme.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
               onGenerateRoute: AppRouter.generateRoute,
               home: const TaskListScreen(),
               //initialRoute: AppRouter.mainScreen,
