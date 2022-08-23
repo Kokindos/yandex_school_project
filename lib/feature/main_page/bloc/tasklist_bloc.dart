@@ -20,7 +20,7 @@ part 'tasklist_bloc.freezed.dart';
 
 class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   //final TaskConnectRepository _taskRepository;
-  final TaskNetworkRepository _taskRepository;
+ final TaskNetworkRepository _taskRepository;
 
   TaskListBloc({
     required TaskNetworkRepository taskRepository,

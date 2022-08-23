@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:hive/hive.dart';
@@ -58,28 +56,9 @@ class LocalStorageApi implements TaskApi {
   @override
   Future<List<Task>> getList() async {
     final box = await Hive.openBox<List<Task>>('tasks');
-    try {
-      final tasklist = box.get('tasks');
-      log(tasklist.runtimeType.toString());
-      log((tasklist==null).toString());
-      if (tasklist==null){
-        box.put('tasks',<Task> []);
-      }
-      await box.close();
-      return tasklist??[];
-    }
-    catch (e){
-      box.put('tasks', <Task> []);
-      return [];
-    }
-    //
-    // log(tasklist.runtimeType.toString());
-    // log((tasklist==null).toString());
-    // if (tasklist==null){
-    //   box.put('tasks',<Task> []);
-    // }
-    // await box.close();
-    // return tasklist ?? [];
+    final tasklist = box.get('tasks');
+    await box.close();
+    return tasklist ?? [];
   }
 
   @override
