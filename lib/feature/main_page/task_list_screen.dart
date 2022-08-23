@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 class TaskListScreen extends StatelessWidget {
   const TaskListScreen({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class TaskListScreen extends StatelessWidget {
           color: Colors.white,
         ),
         onPressed: () {
-          context.read<NavigationService>().onTaskScreen();
+          GetIt.I.get<NavigationService>().onTaskScreen();
         },
       ),
       body: SafeArea(
@@ -177,14 +178,13 @@ class _ItemState extends State<_Item> {
   Future<bool?> dismissDirectionFunc(DismissDirection direction) async {
     if (direction == DismissDirection.startToEnd) {
       BlocProvider.of<TaskListBloc>(context).add(
-        EditTaskEvent(
-          task: widget.task.copyWith(done: !widget.task.done),
-        ),
-      );
+            EditTaskEvent(
+              task: widget.task.copyWith(done: !widget.task.done),
+            ),
+          );
       return false;
     } else {
-      BlocProvider.of<TaskListBloc>(context)
-          .add(DeleteTaskEvent(task: widget.task));
+      BlocProvider.of<TaskListBloc>(context).add(DeleteTaskEvent(task: widget.task));
       return true;
     }
   }
@@ -201,7 +201,7 @@ class _ItemState extends State<_Item> {
       confirmDismiss: dismissDirectionFunc,
       onDismissed: (direction) {},
       secondaryBackground: Container(
-        color: Colors.red,
+        color: Theme.of(context).errorColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -217,7 +217,7 @@ class _ItemState extends State<_Item> {
       ),
       key: ObjectKey(widget.task),
       background: Container(
-        color: Colors.green,
+        color: Theme.of(context).toggleableActiveColor,
         child: Row(
           children: [
             SizedBox(
@@ -231,7 +231,7 @@ class _ItemState extends State<_Item> {
         ),
       ),
       child: GestureDetector(
-        onTap: () => BlocProvider.of<TaskListBloc>(context).add(
+        onTap: () =>  BlocProvider.of<TaskListBloc>(context).add(
           EditTaskEvent(
             task: widget.task.copyWith(done: !widget.task.done),
           ),
@@ -249,8 +249,7 @@ class _ItemState extends State<_Item> {
                     Container(
                       height: 15,
                       width: 15,
-                      color: context
-                          .read<RemoteConfigService>()
+                      color: GetIt.I.get<RemoteConfigService>()
                           .getColor
                           .withOpacity(.2),
                     ),
@@ -263,11 +262,10 @@ class _ItemState extends State<_Item> {
                         ),
                       );
                     },
-                    activeColor: AppTheme.green,
                     side: BorderSide(
                         width: 2,
                         color: widget.task.importance == Priority.important
-                            ? context.read<RemoteConfigService>().getColor
+                            ? GetIt.I.get<RemoteConfigService>().getColor
                             : Theme.of(context).dividerColor),
                   ),
                 ],
@@ -307,9 +305,7 @@ class _ItemState extends State<_Item> {
                                     padding: const EdgeInsets.only(right: 6),
                                     child: SvgPicture.asset(
                                       'lib/assets/icons/icon_important.svg',
-                                      color: context
-                                          .read<RemoteConfigService>()
-                                          .getColor,
+                                      color: GetIt.I.get<RemoteConfigService>().getColor,
                                       allowDrawingOutsideViewBox: true,
                                     ),
                                   ),
@@ -347,9 +343,8 @@ class _ItemState extends State<_Item> {
               ),
               IconButton(
                 onPressed: () {
-                  context
-                      .read<NavigationService>()
-                      .onTaskScreen(task: widget.task);
+
+                  GetIt.I.get<NavigationService>().onTaskScreen(task: widget.task);
                 },
                 icon: Icon(
                   Icons.info_outline,

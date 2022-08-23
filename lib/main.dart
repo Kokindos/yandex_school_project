@@ -1,5 +1,6 @@
 import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/di/di_container.dart';
+import 'package:done/common/di/service_locator.dart';
 import 'package:done/common/routes/app_router.dart';
 import 'package:done/common/services/navigation_service.dart';
 import 'package:done/common/services/remote_config_service.dart';
@@ -20,7 +21,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   final appDocumentDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
@@ -38,41 +38,33 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final NavigationService navigationService = NavigationService();
-  final RemoteConfigService remoteConfig = RemoteConfigService();
+  final ServiceLocator locator = ServiceLocator();
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        Provider<RemoteConfigService>(create: (_) => remoteConfig),
-        Provider<NavigationService>(create: (_) => navigationService),
-        BlocProvider<TaskListBloc>(
-          create: (_) =>
-              TaskListBloc(taskRepository: DIContainer.instance.taskRepository)
-                ..add(const GetListEvent()),
-        ),
-        ...DIContainer.instance.providers,
-      ],
-      child: OverlaySupport.global(
-        child: Consumer<ThemeProvider>(
-          builder: (context, ThemeProvider theme, child) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              navigatorKey: navigationService.navigationKey,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: const [
-                Locale('en'),
-                Locale('ru'),
-              ],
-              theme: AppTheme.darkTheme,
-              //theme.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
-              onGenerateRoute: AppRouter.generateRoute,
-              home: const TaskListScreen(),
-              //initialRoute: AppRouter.mainScreen,
-            );
-          },
+    return BlocProvider<TaskListBloc>(
+      create: (_) => locator.bloc,
+      child: ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+        child: OverlaySupport.global(
+          child: Consumer<ThemeProvider>(
+            builder: (context, ThemeProvider theme, child) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                navigatorKey: locator.navigationService.navigationKey,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: const [
+                  Locale('en'),
+                  Locale('ru'),
+                ],
+                theme: AppTheme.darkTheme,
+                //theme.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
+                onGenerateRoute: AppRouter.generateRoute,
+                home: const TaskListScreen(),
+                //initialRoute: AppRouter.mainScreen,
+              );
+            },
+          ),
         ),
       ),
     );

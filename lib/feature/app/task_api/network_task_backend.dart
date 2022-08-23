@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:done/common/internal/dio_logger_interceptor.dart';
+import 'package:done/common/internal/dio_token_interceptor.dart';
 import 'package:done/feature/app/models/response/task_response.dart';
 import 'package:done/feature/app/models/task.dart';
 
@@ -8,9 +10,18 @@ import '../models/response/list_response.dart';
 import 'task_api.dart';
 
 class NetworkTaskBackend implements TaskApi {
-  final Dio _client;
+  late Dio _client;
 
-  NetworkTaskBackend(this._client);
+
+  NetworkTaskBackend(){
+    final dio = Dio(BaseOptions(
+      baseUrl: 'https://beta.mrdekk.ru/todobackend',
+      connectTimeout: 10000,
+    ));
+    dio.interceptors.add(DioTokenInterceptor());
+    dio.interceptors.add(DioLoggerInterceptor());
+    _client=dio;
+  }
 
   @override
   Future<Task> createTask({required Task task, int? revision}) async {

@@ -43,14 +43,18 @@ class TaskConnectRepository implements TaskRepository {
   Future<List<Task>> getList() async {
     int localRevision = await sharedPrefService.getRevision();
     final localResponse = await taskLocalRepository.getList();
-
-    final removeResponse = await taskNetworkRepository.getRevision();
-    if (localRevision < removeResponse.revision) {
-      taskLocalRepository.updateList(taskList: removeResponse.list);
-      return removeResponse.list;
-    } else {
-      taskNetworkRepository.updateList(
-          taskList: localResponse, revision: removeResponse.revision);
+    try {
+      final removeResponse = await taskNetworkRepository.getRevision();
+      if (localRevision < removeResponse.revision) {
+        taskLocalRepository.updateList(taskList: removeResponse.list);
+        return removeResponse.list;
+      } else {
+        taskNetworkRepository.updateList(
+            taskList: localResponse, revision: removeResponse.revision);
+        return localResponse;
+      }
+    }
+    catch(e){
       return localResponse;
     }
   }

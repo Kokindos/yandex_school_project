@@ -9,6 +9,7 @@ import 'package:done/feature/app/repositories/task_network_repository.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
@@ -27,7 +28,7 @@ class _TaskScreenState extends State<TaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final navigationService = context.read<NavigationService>();
+    final navigationService = GetIt.I.get<NavigationService>();
     return _TaskPage(navigationService, widget.task);
   }
 }
@@ -199,8 +200,8 @@ class _TaskPageState extends State<_TaskPage> {
                             child: Text(
                               AppLocalizations.of(context)!.high,
                               style: TextStyle(
-                                  color: context
-                                      .read<RemoteConfigService>()
+                                  color: GetIt.I
+                                      .get<RemoteConfigService>()
                                       .getColor),
                             ),
                           ),
@@ -307,16 +308,17 @@ class _TaskPageState extends State<_TaskPage> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.delete,
-                              color: AppTheme.red,
+                              color: Theme.of(context).errorColor,
                             ),
                             const SizedBox(
                               width: 17,
                             ),
                             Text(
                               AppLocalizations.of(context)!.delete,
-                              style: const TextStyle(color: AppTheme.red),
+                              style: TextStyle(
+                                  color: Theme.of(context).errorColor),
                             ),
                           ],
                         ),
