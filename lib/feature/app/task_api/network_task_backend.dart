@@ -34,6 +34,7 @@ class NetworkTaskBackend implements TaskApi {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
+    log('NETWORK CREATE TASK');
     return TaskResponse.fromJson(response.data).element;
   }
 

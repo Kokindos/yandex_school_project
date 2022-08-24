@@ -92,7 +92,6 @@ class _TaskListPageState extends State<_TaskListPage> {
     setState(() {
       this.showDoneTasks = showDoneTasks;
     });
-    log(showDoneTasks.toString());
     if (showDoneTasks) {
       return widget.tasks;
     } else {

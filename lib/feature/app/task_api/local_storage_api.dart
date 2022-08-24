@@ -9,6 +9,7 @@ import 'task_api.dart';
 class LocalStorageApi implements TaskApi {
   @override
   Future<Task> createTask({required Task task, int? revision}) async {
+    log('LOCAL CREATE TASK');
     final box = Hive.box<Task>('tasks');
     box.put(task.id, task);
     return task;
