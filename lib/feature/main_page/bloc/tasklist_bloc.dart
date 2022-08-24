@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:done/feature/app/repositories/task_local_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -19,11 +20,12 @@ part 'tasklist_state.dart';
 part 'tasklist_bloc.freezed.dart';
 
 class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
-  //final TaskConnectRepository _taskRepository;
- final TaskNetworkRepository _taskRepository;
+  //final TaskLocalRepository _taskRepository;
+ //final TaskNetworkRepository _taskRepository;
+  final TaskConnectRepository _taskRepository;
 
   TaskListBloc({
-    required TaskNetworkRepository taskRepository,
+    required TaskConnectRepository taskRepository,
   })  : _taskRepository = taskRepository,
         super(const TaskListState.loading()) {
     on<GetListEvent>(_onGetList);
@@ -131,7 +133,9 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   Future<void> _onGetList(
+
       GetListEvent event, Emitter<TaskListState> emit) async {
+    log('BLOC ON GET LIST');
     emit(
       const TaskListState.loading(),
     );

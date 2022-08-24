@@ -1,89 +1,61 @@
+import 'dart:developer';
+
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:hive/hive.dart';
-
+import '../../../logger.dart';
 import 'task_api.dart';
 
 class LocalStorageApi implements TaskApi {
   @override
   Future<Task> createTask({required Task task, int? revision}) async {
-    final box = await Hive.openBox<List<Task>>('tasks');
-    final tasklist = box.get('tasks');
-    if (tasklist != null) {
-      tasklist.add(task);
-      box.put('tasks', tasklist);
-    }
-    await box.close();
+    final box = Hive.box<Task>('tasks');
+    box.put(task.id, task);
     return task;
   }
 
   @override
   Future<Task> deleteTask({required String id, int? revision}) async {
-    final box = await Hive.openBox<List<Task>>('tasks');
-    final tasklist = box.get('tasks');
-    Task task=  Task(text: '',done: false,importance: Priority.basic, id: id);
-    if (tasklist != null) {
-      for (int i = 0; i < tasklist.length; i++) {
-        if (tasklist[i].id == id) {
-          task = tasklist[i];
-          tasklist.removeAt(i);
-          break;
-        }
-      }
-      box.put('tasks', tasklist);
-    }
-    await box.close();
+    final box = Hive.box<Task>('tasks');
+    Task task = box.get(id)!;
+    box.delete(id);
     return task;
   }
 
   @override
   Future<Task> editTask({required Task task, int? revision}) async {
-    final box = await Hive.openBox<List<Task>>('tasks');
-    final tasklist = box.get('tasks');
-    if (tasklist != null) {
-      for (int i = 0; i < tasklist.length; i++) {
-        if (tasklist[i].id == task.id) {
-          tasklist[i] = task;
-          break;
-        }
-      }
-      box.put('tasks', tasklist);
-    }
-    await box.close();
+    final box = Hive.box<Task>('tasks');
+    await box.put(task.id, task);
     return task;
   }
 
   @override
   Future<List<Task>> getList() async {
-    final box = await Hive.openBox<List<Task>>('tasks');
-    final tasklist = box.get('tasks');
-    await box.close();
-    return tasklist ?? [];
+    log('local storage get list');
+    final box = Hive.box<Task>('tasks');
+    log('ERROR 1');
+    final List<dynamic> tasklist = box.values.cast().toList();
+
+    final newlist = tasklist.map((e) => e as Task).toList();
+
+    log('local storage newlist');
+    return newlist;
   }
 
   @override
   Future<Task> getTask({required String id, int? revision}) async {
-    final box = await Hive.openBox<List<Task>>('tasks');
-    final tasklist = box.get('tasks');
-    Task task= Task(text: '',done: false,importance: Priority.basic, id: id,);
-    if (tasklist != null) {
-      for (int i = 0; i < tasklist.length; i++) {
-        if(tasklist[i].id==id){
-          task=tasklist[i];
-          break;
-        }
-      }
-    }
-    await box.close();
+    final box = Hive.box<Task>('tasks');
+    Task task = box.get(id)!;
     return task;
   }
 
   @override
   Future<List<Task>> updateList(
       {required List<Task> taskList, int? revision}) async {
-    final box = await Hive.openBox<List<Task>>('tasks');
-    box.put('tasks', taskList);
-    await box.close();
+    final box = Hive.box<Task>('tasks');
+    for (var task in taskList) {
+      box.put(task.id, task);
+    }
     return taskList;
   }
 }

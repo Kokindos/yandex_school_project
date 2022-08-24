@@ -22,6 +22,7 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log('tasklistscreen');
     //TODO: animatedlist
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -41,7 +42,10 @@ class TaskListScreen extends StatelessWidget {
             ),
             child: BlocBuilder<TaskListBloc, TaskListState>(
               builder: (context, state) {
+                log('bloc builder');
+                log(state.toString());
                 if (state is TaskListLoadedState) {
+                  log('bloc builder');
                   return _TaskListPage(
                     tasks: state.tasks,
                   );
@@ -98,6 +102,7 @@ class _TaskListPageState extends State<_TaskListPage> {
 
   @override
   Widget build(BuildContext context) {
+    log('task list page');
     return CustomScrollView(
       slivers: [
         SliverPersistentHeader(
@@ -178,13 +183,14 @@ class _ItemState extends State<_Item> {
   Future<bool?> dismissDirectionFunc(DismissDirection direction) async {
     if (direction == DismissDirection.startToEnd) {
       BlocProvider.of<TaskListBloc>(context).add(
-            EditTaskEvent(
-              task: widget.task.copyWith(done: !widget.task.done),
-            ),
-          );
+        EditTaskEvent(
+          task: widget.task.copyWith(done: !widget.task.done),
+        ),
+      );
       return false;
     } else {
-      BlocProvider.of<TaskListBloc>(context).add(DeleteTaskEvent(task: widget.task));
+      BlocProvider.of<TaskListBloc>(context)
+          .add(DeleteTaskEvent(task: widget.task));
       return true;
     }
   }
@@ -231,7 +237,7 @@ class _ItemState extends State<_Item> {
         ),
       ),
       child: GestureDetector(
-        onTap: () =>  BlocProvider.of<TaskListBloc>(context).add(
+        onTap: () => BlocProvider.of<TaskListBloc>(context).add(
           EditTaskEvent(
             task: widget.task.copyWith(done: !widget.task.done),
           ),
@@ -249,7 +255,8 @@ class _ItemState extends State<_Item> {
                     Container(
                       height: 15,
                       width: 15,
-                      color: GetIt.I.get<RemoteConfigService>()
+                      color: GetIt.I
+                          .get<RemoteConfigService>()
                           .getColor
                           .withOpacity(.2),
                     ),
@@ -305,7 +312,9 @@ class _ItemState extends State<_Item> {
                                     padding: const EdgeInsets.only(right: 6),
                                     child: SvgPicture.asset(
                                       'lib/assets/icons/icon_important.svg',
-                                      color: GetIt.I.get<RemoteConfigService>().getColor,
+                                      color: GetIt.I
+                                          .get<RemoteConfigService>()
+                                          .getColor,
                                       allowDrawingOutsideViewBox: true,
                                     ),
                                   ),
@@ -343,8 +352,9 @@ class _ItemState extends State<_Item> {
               ),
               IconButton(
                 onPressed: () {
-
-                  GetIt.I.get<NavigationService>().onTaskScreen(task: widget.task);
+                  GetIt.I
+                      .get<NavigationService>()
+                      .onTaskScreen(task: widget.task);
                 },
                 icon: Icon(
                   Icons.info_outline,
@@ -378,65 +388,50 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
+    final progress = shrinkOffset / maxExtent;
     return Material(
       elevation: shrinkOffset < delta ? 0 : 4,
-      child: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        padding: EdgeInsets.only(
-          left: shrinkOffset < delta ? 52 : 16,
-          top: shrinkOffset < delta ? 50 : 16,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.myTasks,
-                  style: shrinkOffset < delta
-                      ? Theme.of(context).textTheme.headline1!
-                      : Theme.of(context).textTheme.headline2!,
-                ),
-                if (shrinkOffset > delta)
-                  _HideButton(
-                    callback: callback,
-                    showDoneTasks: showDoneTasks,
-                  ),
-              ],
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedContainer(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            duration: const Duration(milliseconds: 100),
+            padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 82),
+                const EdgeInsets.only(left: 16, top: 16), progress),
+            child: Text(
+              AppLocalizations.of(context)!.myTasks,
+              style: TextStyle.lerp(Theme.of(context).textTheme.headline1!,
+                  Theme.of(context).textTheme.headline2!, progress),
             ),
-            const SizedBox(
-              height: 6,
-            ),
-            if (shrinkOffset < delta)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
-                    style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyText2!
-                              .color!
-                              .withOpacity(.3),
-                        ),
-                  ),
-                  _HideButton(
-                    callback: callback,
-                    showDoneTasks: showDoneTasks,
-                  ),
-                ],
+          ),
+          Container(
+            padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 126),
+                const EdgeInsets.only(left: 16, top: 25), progress),
+            child: AnimatedOpacity(
+              opacity: 1 - progress,
+              duration: const Duration(milliseconds: 1),
+              child: Text(
+                '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
+                style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                      color: Theme.of(context).hintColor,
+                    ),
               ),
-          ],
-        ),
+            ),
+          ),
+          Positioned(
+            bottom: 39,
+            right: -10,
+            child:
+                _HideButton(showDoneTasks: showDoneTasks, callback: callback),
+          ),
+        ],
       ),
     );
   }
 
   @override
-  double get maxExtent => 200;
+  double get maxExtent => 164;
 
   @override
   double get minExtent => 80;

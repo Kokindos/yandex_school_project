@@ -1,3 +1,11 @@
+import 'package:hive/hive.dart';
+part 'priority.g.dart';
+@HiveType(typeId: 1,adapterName: 'PriorityAdapter')
 enum Priority{
-  basic,low,important
+  @HiveField(0)
+  basic,
+  @HiveField(1)
+  low,
+  @HiveField(2)
+  important
 }

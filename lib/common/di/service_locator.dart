@@ -23,7 +23,7 @@ class ServiceLocator {
     final taskConnectRepository = TaskConnectRepository(
         taskLocalRepository: taskLocalRepository,
         taskNetworkRepository: taskNetworkRepository);
-    bloc = TaskListBloc(taskRepository: taskNetworkRepository)
+    bloc = TaskListBloc(taskRepository: taskConnectRepository)
       ..add(const GetListEvent());
     register();
   }
