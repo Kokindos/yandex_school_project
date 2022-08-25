@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-import 'package:done/feature/app/repositories/task_local_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -11,7 +9,6 @@ import 'package:done/feature/app/repositories/task_connect_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
-import '../../app/repositories/task_network_repository.dart';
 
 part 'tasklist_event.dart';
 
@@ -132,28 +129,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
       );
     }
   }
-
-  // void _onGetTask(GetTaskEvent event, Emitter<TaskListState> emit) {
-  //   try {
-  //     if (state is TaskListLoadedState) {
-  //       final currentState = state as TaskListLoadedState;
-  //       final List<Task> newTasks = List.from(currentState.tasks);
-  //       if (event.id == null) {
-  //         emit(TaskListState.loaded(
-  //             task: Task(
-  //                 id: const Uuid().v1(),
-  //                 text: '',
-  //                 done: false,
-  //                 importance: Priority.basic),
-  //             tasks: newTasks));
-  //       }
-  //       final myTask = newTasks.firstWhere((element) => element.id == event.id);
-  //       emit(TaskListState.loaded(task: myTask, tasks: newTasks));
-  //     }
-  //   } catch (e) {
-  //     emit(TaskListState.error(message: e.toString()));
-  //   }
-  // }
 
   Future<void> _onGetList(
       GetListEvent event, Emitter<TaskListState> emit) async {
