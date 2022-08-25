@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/common/services/theme_provider.dart';
 import 'package:done/feature/app/navigator/app_navigator.dart';

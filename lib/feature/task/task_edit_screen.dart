@@ -9,9 +9,7 @@ import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
-
 import '../app/navigator/app_navigator.dart';
-
 class TaskEditScreen extends StatefulWidget {
   final Task? task;
 
