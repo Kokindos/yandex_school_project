@@ -395,7 +395,7 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
         children: [
           AnimatedContainer(
             color: Theme.of(context).scaffoldBackgroundColor,
-            duration: const Duration(milliseconds: 100),
+            duration: const Duration(milliseconds: 30),
             padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 82),
                 const EdgeInsets.only(left: 16, top: 16), progress),
             child: Text(
@@ -419,11 +419,12 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
             ),
           ),
           Positioned(
-            bottom: 39,
-            right: -10,
+           bottom: 4,
+            right: -9,
             child:
                 _HideButton(showDoneTasks: showDoneTasks, callback: callback),
           ),
+
         ],
       ),
     );
@@ -433,7 +434,7 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 164;
 
   @override
-  double get minExtent => 80;
+  double get minExtent => 64;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
