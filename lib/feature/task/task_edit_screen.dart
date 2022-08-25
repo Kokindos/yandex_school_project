@@ -1,11 +1,7 @@
-import 'dart:developer';
 
-import 'package:done/assets/theme/theme.dart';
-import 'package:done/common/services/navigation_service.dart';
 import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
-import 'package:done/feature/app/repositories/task_network_repository.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,32 +10,30 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-class TaskScreen extends StatefulWidget {
+import '../app/navigator/app_navigator.dart';
+
+class TaskEditScreen extends StatefulWidget {
   final Task? task;
 
-  const TaskScreen({Key? key, this.task}) : super(key: key);
+  const TaskEditScreen({Key? key, this.task}) : super(key: key);
 
   @override
-  State<TaskScreen> createState() => _TaskScreenState();
+  State<TaskEditScreen> createState() => _TaskEditScreenState();
 }
 
-class _TaskScreenState extends State<TaskScreen> {
+class _TaskEditScreenState extends State<TaskEditScreen> {
   DateTime currentDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    final navigationService = GetIt.I.get<NavigationService>();
-    return _TaskPage(navigationService, widget.task);
+    return _TaskPage(widget.task);
   }
 }
 
 class _TaskPage extends StatefulWidget {
   _TaskPage(
-    this.navigationService,
     this.task,
   );
-
-  final NavigationService navigationService;
 
   Task? task;
 
@@ -56,6 +50,7 @@ class _TaskPageState extends State<_TaskPage> {
 
   @override
   void initState() {
+    super.initState();
     if (widget.task == null) {
       task = Task(
           id: const Uuid().v1(),
@@ -67,6 +62,22 @@ class _TaskPageState extends State<_TaskPage> {
       task = widget.task!;
       isNew = false;
     }
+    // if (widget.task == null) {
+    //   GetIt.I.get<NavigationService>().onPop();
+    //   task = Task(
+    //       id: const Uuid().v1(),
+    //       text: '',
+    //       done: false,
+    //       importance: Priority.basic);
+    //   isNew = true;
+    // } else {
+    //   task = widget.task!;
+    //   if (task.text == '') {
+    //     isNew = true;
+    //   } else {
+    //     isNew = false;
+    //   }
+    // }
   }
 
   @override
@@ -93,7 +104,7 @@ class _TaskPageState extends State<_TaskPage> {
       appBar: AppBar(
         elevation: scrollOverflow ? 4 : 0,
         leading: IconButton(
-          onPressed: widget.navigationService.onPop,
+          onPressed: GetIt.I.get<AppNavigator>().navigationDelegate.openList,
           icon: const Icon(Icons.close),
         ),
         actions: [
@@ -104,7 +115,7 @@ class _TaskPageState extends State<_TaskPage> {
                   ? CreateTaskEvent(textController.text,
                       deadline: task.deadline, importance: task.importance)
                   : EditTaskEvent(task: task));
-              widget.navigationService.onPop();
+              GetIt.I.get<AppNavigator>().navigationDelegate.openList();
             },
             child: Text(
               AppLocalizations.of(context)!.save,
@@ -298,7 +309,10 @@ class _TaskPageState extends State<_TaskPage> {
                       onTap: () {
                         BlocProvider.of<TaskListBloc>(context)
                             .add(DeleteTaskEvent(task: task));
-                        widget.navigationService.onPop();
+                        GetIt.I
+                            .get<AppNavigator>()
+                            .navigationDelegate
+                            .openList();
                       },
                       child: Container(
                         width: 112,

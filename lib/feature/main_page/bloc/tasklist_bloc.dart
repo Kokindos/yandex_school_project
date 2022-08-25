@@ -21,7 +21,7 @@ part 'tasklist_bloc.freezed.dart';
 
 class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   //final TaskLocalRepository _taskRepository;
- //final TaskNetworkRepository _taskRepository;
+  //final TaskNetworkRepository _taskRepository;
   final TaskConnectRepository _taskRepository;
 
   TaskListBloc({
@@ -32,6 +32,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
     on<DeleteTaskEvent>(_onDelete);
     on<CreateTaskEvent>(_onCreate);
     on<EditTaskEvent>(_onEdit);
+    //on<GetTaskEvent>(_onGetTask);
   }
 
   Future getDeviceInfo() async {
@@ -92,8 +93,8 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
     );
     try {
       if (state is TaskListLoadedState) {
-        final currentState=state as TaskListLoadedState;
-        final List<Task> newTasks= List.from(currentState.tasks);
+        final currentState = state as TaskListLoadedState;
+        final List<Task> newTasks = List.from(currentState.tasks);
         newTasks.add(task);
 
         emit(
@@ -132,10 +133,30 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
     }
   }
 
-  Future<void> _onGetList(
+  // void _onGetTask(GetTaskEvent event, Emitter<TaskListState> emit) {
+  //   try {
+  //     if (state is TaskListLoadedState) {
+  //       final currentState = state as TaskListLoadedState;
+  //       final List<Task> newTasks = List.from(currentState.tasks);
+  //       if (event.id == null) {
+  //         emit(TaskListState.loaded(
+  //             task: Task(
+  //                 id: const Uuid().v1(),
+  //                 text: '',
+  //                 done: false,
+  //                 importance: Priority.basic),
+  //             tasks: newTasks));
+  //       }
+  //       final myTask = newTasks.firstWhere((element) => element.id == event.id);
+  //       emit(TaskListState.loaded(task: myTask, tasks: newTasks));
+  //     }
+  //   } catch (e) {
+  //     emit(TaskListState.error(message: e.toString()));
+  //   }
+  // }
 
+  Future<void> _onGetList(
       GetListEvent event, Emitter<TaskListState> emit) async {
-    log('BLOC ON GET LIST');
     emit(
       const TaskListState.loading(),
     );

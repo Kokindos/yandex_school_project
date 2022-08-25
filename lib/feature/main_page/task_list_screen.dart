@@ -1,11 +1,7 @@
 import 'dart:developer';
-
-import 'package:done/assets/theme/theme.dart';
-import 'package:done/common/di/di_container.dart';
-import 'package:done/common/services/navigation_service.dart';
 import 'package:done/common/services/remote_config_service.dart';
-import 'package:done/common/services/theme_pref_service.dart';
 import 'package:done/common/services/theme_provider.dart';
+import 'package:done/feature/app/navigator/app_navigator.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,12 +14,17 @@ import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 
 class TaskListScreen extends StatelessWidget {
-  const TaskListScreen({Key? key}) : super(key: key);
+  const TaskListScreen({
+    Key? key,
+    required this.navigatorCallback,
+  }) : super(key: key);
+
+  final Function(Task task) navigatorCallback;
 
   @override
   Widget build(BuildContext context) {
-    log('tasklistscreen');
     //TODO: animatedlist
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: const Icon(
@@ -31,7 +32,7 @@ class TaskListScreen extends StatelessWidget {
           color: Colors.white,
         ),
         onPressed: () {
-          GetIt.I.get<NavigationService>().onTaskScreen();
+          GetIt.I.get<AppNavigator>().navigationDelegate.createNewTask();
         },
       ),
       body: SafeArea(
@@ -42,11 +43,9 @@ class TaskListScreen extends StatelessWidget {
             ),
             child: BlocBuilder<TaskListBloc, TaskListState>(
               builder: (context, state) {
-                log('bloc builder');
-                log(state.toString());
                 if (state is TaskListLoadedState) {
-                  log('bloc builder');
                   return _TaskListPage(
+                    navigatorCallback: navigatorCallback,
                     tasks: state.tasks,
                   );
                 } else if (state is TaskListErrorState) {
@@ -70,9 +69,12 @@ class TaskListScreen extends StatelessWidget {
 class _TaskListPage extends StatefulWidget {
   const _TaskListPage({
     required this.tasks,
+    required this.navigatorCallback,
   });
 
   final List<Task> tasks;
+  final Function(Task task) navigatorCallback;
+
 
   @override
   State<_TaskListPage> createState() => _TaskListPageState();
@@ -101,76 +103,82 @@ class _TaskListPageState extends State<_TaskListPage> {
 
   @override
   Widget build(BuildContext context) {
-    log('task list page');
-    return CustomScrollView(
-      slivers: [
-        SliverPersistentHeader(
-          delegate: _AppBarDelegate(
-              doneTasksCounter:
-                  widget.tasks.where((element) => element.done == true).length,
-              showDoneTasks: showDoneTasks,
-              callback: (value) => showFilteredList(showDoneTasks: value)),
-          pinned: true,
-          floating: true,
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Material(
-              borderRadius: BorderRadius.circular(16),
-              elevation: 2.2,
-              shadowColor: Colors.black54,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Theme.of(context).backgroundColor,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 7),
-                child: Column(
-                  children: [
-                    for (var task
-                        in showFilteredList(showDoneTasks: showDoneTasks))
-                      _Item(task: task),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 36),
-                      child: TextField(
-                        textCapitalization: TextCapitalization.sentences,
-                        textInputAction: TextInputAction.done,
-                        controller: textEditingController,
-                        onSubmitted: (value) {
-                          if (textEditingController.text != '') {
-                            BlocProvider.of<TaskListBloc>(context).add(
-                                CreateTaskEvent(textEditingController.text));
-                            textEditingController.clear();
-                          }
-                        },
-                        maxLines: null,
-                        minLines: 1,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.newTask,
+    return RefreshIndicator(
+      onRefresh: () => Future(() =>
+          BlocProvider.of<TaskListBloc>(context).add(const GetListEvent())),
+      child: CustomScrollView(
+        slivers: [
+          SliverPersistentHeader(
+            delegate: _AppBarDelegate(
+                doneTasksCounter: widget.tasks
+                    .where((element) => element.done == true)
+                    .length,
+                showDoneTasks: showDoneTasks,
+                callback: (value) => showFilteredList(showDoneTasks: value)),
+            pinned: true,
+            floating: true,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              Material(
+                borderRadius: BorderRadius.circular(16),
+                elevation: 2.2,
+                shadowColor: Colors.black54,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Theme.of(context).backgroundColor,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 7),
+                  child: Column(
+                    children: [
+                      for (var task
+                          in showFilteredList(showDoneTasks: showDoneTasks))
+                        _Item(task: task, navigatorCallback: widget.navigatorCallback,),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 36),
+                        child: TextField(
+                          textCapitalization: TextCapitalization.sentences,
+                          textInputAction: TextInputAction.done,
+                          controller: textEditingController,
+                          onSubmitted: (value) {
+                            if (textEditingController.text != '') {
+                              BlocProvider.of<TaskListBloc>(context).add(
+                                  CreateTaskEvent(textEditingController.text));
+                              textEditingController.clear();
+                            }
+                          },
+                          maxLines: null,
+                          minLines: 1,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            hintText: AppLocalizations.of(context)!.newTask,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ]),
-        ),
-        const SliverToBoxAdapter(
-          child: SizedBox(
-            height: 16,
+            ]),
           ),
-        ),
-      ],
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _Item extends StatefulWidget {
+  final Function(Task task) navigatorCallback;
+
   final Task task;
 
-  const _Item({Key? key, required this.task}) : super(key: key);
+  const _Item({Key? key, required this.task, required this.navigatorCallback,}) : super(key: key);
 
   @override
   State<_Item> createState() => _ItemState();
@@ -351,9 +359,11 @@ class _ItemState extends State<_Item> {
               ),
               IconButton(
                 onPressed: () {
-                  GetIt.I
-                      .get<NavigationService>()
-                      .onTaskScreen(task: widget.task);
+                  widget.navigatorCallback(widget.task);
+
+                  // GetIt.I
+                  //     .get<NavigationService>()
+                  //     .onTaskScreen(task: widget.task);
                 },
                 icon: Icon(
                   Icons.info_outline,
@@ -388,45 +398,67 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final progress = shrinkOffset / maxExtent;
-    return Material(
-      elevation: shrinkOffset < delta ? 0 : 4,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          AnimatedContainer(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            duration: const Duration(milliseconds: 30),
-            padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 82),
-                const EdgeInsets.only(left: 16, top: 16), progress),
-            child: Text(
-              AppLocalizations.of(context)!.myTasks,
-              style: TextStyle.lerp(Theme.of(context).textTheme.headline1!,
-                  Theme.of(context).textTheme.headline2!, progress),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 126),
-                const EdgeInsets.only(left: 16, top: 25), progress),
-            child: AnimatedOpacity(
-              opacity: 1 - progress,
-              duration: const Duration(milliseconds: 1),
-              child: Text(
-                '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
-                style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
+    return Consumer<ThemeProvider>(
+      builder: (context, ThemeProvider themeNotifier, child) {
+        return Material(
+          elevation: shrinkOffset < delta ? 0 : 4,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              AnimatedContainer(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                duration: const Duration(milliseconds: 30),
+                padding: EdgeInsets.lerp(
+                    const EdgeInsets.only(left: 52, top: 82),
+                    const EdgeInsets.only(left: 16, top: 16),
+                    progress),
+                child: Text(
+                  AppLocalizations.of(context)!.myTasks,
+                  style: TextStyle.lerp(Theme.of(context).textTheme.headline1!,
+                      Theme.of(context).textTheme.headline2!, progress),
+                ),
               ),
-            ),
+              Container(
+                padding: EdgeInsets.lerp(
+                    const EdgeInsets.only(left: 52, top: 126),
+                    const EdgeInsets.only(left: 16, top: 25),
+                    progress),
+                child: AnimatedOpacity(
+                  opacity: 1 - progress,
+                  duration: const Duration(milliseconds: 1),
+                  child: Text(
+                    '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
+                    style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                          color: Theme.of(context).hintColor,
+                        ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 4,
+                right: -9,
+                child: _HideButton(
+                    showDoneTasks: showDoneTasks, callback: callback),
+              ),
+              Positioned(
+                right: 8,
+                top: 24,
+                child: IconButton(
+                  icon: Icon(themeNotifier.isDark
+                      ? Icons.nightlight_round_outlined
+                      : Icons.wb_sunny),
+                  color: themeNotifier.isDark ? Colors.white : Colors.black,
+                  onPressed: () {
+                    themeNotifier.isDark
+                        ? themeNotifier.isDark = false
+                        : themeNotifier.isDark = true;
+                  },
+                ),
+              ),
+            ],
           ),
-          Positioned(
-           bottom: 4,
-            right: -9,
-            child:
-                _HideButton(showDoneTasks: showDoneTasks, callback: callback),
-          ),
-
-        ],
-      ),
+        );
+      },
     );
   }
 

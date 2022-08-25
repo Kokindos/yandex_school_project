@@ -16,6 +16,8 @@ abstract class AppTheme {
 
 
   static ThemeData get lightTheme => ThemeData(
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: _primaryColorLight),
         toggleableActiveColor: _greenLight,
         errorColor: _redLight,
         colorScheme: const ColorScheme.light(
