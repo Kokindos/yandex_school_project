@@ -44,6 +44,7 @@ class NetworkTaskBackend implements TaskApi {
 
   Future<ListResponse> getRevision() async {
     final response = await _client.get('/list');
+    log('NETWORK GET LIST');
     return ListResponse.fromJson(response.data);
   }
 
@@ -57,6 +58,7 @@ class NetworkTaskBackend implements TaskApi {
         headers: {'X-Last-Known-Revision': revision!},
       ),
     );
+    log('NETWORK UPDATE LIST');
     return ListResponse.fromJson(response.data).list;
   }
 
@@ -71,6 +73,7 @@ class NetworkTaskBackend implements TaskApi {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
+    log('NETWORK EDIT TASK');
     return TaskResponse.fromJson(response.data).element;
   }
 
@@ -83,6 +86,7 @@ class NetworkTaskBackend implements TaskApi {
         headers: {'X-Last-Known-Revision': revision},
       ),
     );
+    log('NETWORK DELETE TASK');
     return TaskResponse.fromJson(response.data).element;
   }
 

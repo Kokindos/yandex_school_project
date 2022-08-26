@@ -1,4 +1,3 @@
-
 import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
@@ -10,10 +9,13 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 import '../app/navigator/app_navigator.dart';
+
 class TaskEditScreen extends StatefulWidget {
   final Task? task;
+  final bool isNew;
 
-  const TaskEditScreen({Key? key, this.task}) : super(key: key);
+  const TaskEditScreen({Key? key, this.task, required this.isNew})
+      : super(key: key);
 
   @override
   State<TaskEditScreen> createState() => _TaskEditScreenState();
@@ -24,15 +26,14 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _TaskPage(widget.task);
+    return _TaskPage(widget.task, widget.isNew);
   }
 }
 
 class _TaskPage extends StatefulWidget {
-  _TaskPage(
-    this.task,
-  );
+  _TaskPage(this.task, this.isNew);
 
+  bool isNew;
   Task? task;
 
   @override
@@ -44,7 +45,6 @@ class _TaskPageState extends State<_TaskPage> {
       TextEditingController(text: task.text);
   var scrollOverflow = false;
   late Task task;
-  late bool isNew;
 
   @override
   void initState() {
@@ -55,27 +55,9 @@ class _TaskPageState extends State<_TaskPage> {
           text: '',
           done: false,
           importance: Priority.basic);
-      isNew = true;
     } else {
       task = widget.task!;
-      isNew = false;
     }
-    // if (widget.task == null) {
-    //   GetIt.I.get<NavigationService>().onPop();
-    //   task = Task(
-    //       id: const Uuid().v1(),
-    //       text: '',
-    //       done: false,
-    //       importance: Priority.basic);
-    //   isNew = true;
-    // } else {
-    //   task = widget.task!;
-    //   if (task.text == '') {
-    //     isNew = true;
-    //   } else {
-    //     isNew = false;
-    //   }
-    // }
   }
 
   @override
@@ -109,7 +91,7 @@ class _TaskPageState extends State<_TaskPage> {
           TextButton(
             onPressed: () {
               task = task.copyWith(text: textController.text);
-              BlocProvider.of<TaskListBloc>(context).add(isNew
+              BlocProvider.of<TaskListBloc>(context).add(widget.isNew
                   ? CreateTaskEvent(textController.text,
                       deadline: task.deadline, importance: task.importance)
                   : EditTaskEvent(task: task));
@@ -279,7 +261,7 @@ class _TaskPageState extends State<_TaskPage> {
               const SizedBox(
                 height: 15,
               ),
-              isNew
+              widget.isNew
                   ? Container(
                       width: 112,
                       padding: const EdgeInsets.symmetric(

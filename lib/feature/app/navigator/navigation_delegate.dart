@@ -8,6 +8,7 @@ import 'package:rxdart/rxdart.dart';
 class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NavigatorConfigState> {
   Task? task;
+  var isNew = false;
 
   final BehaviorSubject<List<Task>> tasksStream;
 
@@ -16,14 +17,15 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     required this.tasksStream,
   });
 
-
-  void openList(){
+  void openList() {
     task = null;
+    isNew = false;
     notifyListeners();
   }
 
   void createNewTask() {
     task = Task.initial();
+    isNew = true;
     notifyListeners();
   }
 
@@ -37,13 +39,17 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
           child: TaskListScreen(
             navigatorCallback: (t) {
               task = t;
+              isNew = false;
               notifyListeners();
             },
           ),
         ),
         if (task != null)
           MaterialPage(
-            child: TaskEditScreen(task: task),
+            child: TaskEditScreen(
+              task: task,
+              isNew: isNew,
+            ),
           ),
       ],
     );
@@ -55,15 +61,15 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
   @override
   Future<void> setNewRoutePath(NavigatorConfigState configuration) async {
     if (configuration is NavigatorTaskState) {
-     final tasks = tasksStream.value;
-     final index = tasks.indexWhere((element) => element.id == configuration.id);
-     if(index != -1){
-       task = tasks[index];
-     }
+      final tasks = tasksStream.value;
+      final index =
+          tasks.indexWhere((element) => element.id == configuration.id);
+      if (index != -1) {
+        task = tasks[index];
+      }
     } else {
       task = null;
     }
-
     notifyListeners();
   }
 }

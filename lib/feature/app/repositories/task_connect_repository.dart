@@ -50,7 +50,9 @@ class TaskConnectRepository implements TaskRepository {
         return removeResponse.list;
       } else {
         taskNetworkRepository.updateList(
-            taskList: localResponse, revision: removeResponse.revision);
+            taskList: localResponse,
+            revision: removeResponse.revision
+        );
         return localResponse;
       }
     }
