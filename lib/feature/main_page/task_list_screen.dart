@@ -48,9 +48,8 @@ class TaskListScreen extends StatelessWidget {
                     tasks: state.tasks,
                   );
                 } else if (state is TaskListErrorState) {
-                  return Center(
-                    //SnackBar
-
+                   return
+                  Center(
                     child: Text('$state.message'),
                   );
                 } else {

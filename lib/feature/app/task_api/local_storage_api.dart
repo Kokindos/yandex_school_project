@@ -36,7 +36,7 @@ class LocalStorageApi implements TaskApi {
     final List<dynamic> tasklist = box.values.cast().toList();
 
     final newlist = tasklist.map((e) => e as Task).toList();
-
+    log('HIVE VALUES ${box.values}');
     return newlist;
   }
 

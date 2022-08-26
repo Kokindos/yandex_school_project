@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:done/common/services/revision_pref_service.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_local_repository.dart';
@@ -45,6 +47,7 @@ class TaskConnectRepository implements TaskRepository {
     final localResponse = await taskLocalRepository.getList();
     try {
       final removeResponse = await taskNetworkRepository.getRevision();
+      log('NETWORK REVISION ${removeResponse.revision}');
       if (localRevision < removeResponse.revision) {
         taskLocalRepository.updateList(taskList: removeResponse.list);
         return removeResponse.list;

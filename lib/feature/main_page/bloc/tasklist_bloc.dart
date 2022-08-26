@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
@@ -29,7 +30,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
     on<DeleteTaskEvent>(_onDelete);
     on<CreateTaskEvent>(_onCreate);
     on<EditTaskEvent>(_onEdit);
-    //on<GetTaskEvent>(_onGetTask);
   }
 
   Future getDeviceInfo() async {
