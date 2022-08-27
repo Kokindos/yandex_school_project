@@ -25,6 +25,7 @@ flutter_icons:
   ios: true
 
 dependencies:
+  appmetrica_plugin: ^1.0.1
   sliver_tools: ^0.2.7
   diffutil_sliverlist: ^0.5.1
   get_it: ^7.2.0

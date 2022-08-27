@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/navigator/navigator_state.dart';
 import 'package:done/feature/main_page/task_list_screen.dart';
@@ -22,18 +23,21 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
   void openList() {
     task = null;
     isNew = false;
+    AppMetrica.reportEvent('Navigation transition to TaskListScreen');
     notifyListeners();
   }
 
   void createNewTask() {
     task = Task.initial();
     isNew = true;
+    AppMetrica.reportEvent('Navigation transition to EditTaskScreen to create new task');
     notifyListeners();
   }
 
   void editTask(Task task) {
     task = task;
     isNew = false;
+    AppMetrica.reportEvent('Navigation transition to EditTaskScreen to edit task');
     notifyListeners();
   }
 

@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.6.0"
+  appmetrica_plugin:
+    dependency: "direct main"
+    description:
+      name: appmetrica_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   archive:
     dependency: transitive
     description:
@@ -197,6 +204,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.3"
+  decimal:
+    dependency: transitive
+    description:
+      name: decimal
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.0"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -756,6 +770,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
+  rational:
+    dependency: transitive
+    description:
+      name: rational
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.0"
   rxdart:
     dependency: "direct main"
     description:

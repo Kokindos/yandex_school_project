@@ -1,3 +1,4 @@
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:done/app.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
@@ -11,6 +12,8 @@ import 'common/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppMetrica.activate(const AppMetricaConfig(
+      '225399c2-c425-4084-b775-63c00a063c79225399c2-c425-4084-b775-63c00a063c79'));
   initLogger();
   if (kIsWeb) {
     await Firebase.initializeApp(

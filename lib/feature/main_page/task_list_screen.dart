@@ -1,5 +1,4 @@
 import 'package:done/common/services/remote_config_service.dart';
-import 'package:done/common/services/theme_provider.dart';
 import 'package:diffutil_sliverlist/diffutil_sliverlist.dart';
 import 'package:done/feature/app/navigator/app_navigator.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
-import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -417,10 +415,6 @@ class _ItemState extends State<_Item> {
               IconButton(
                 onPressed: () {
                   widget.navigatorCallback(widget.task);
-
-                  // GetIt.I
-                  //     .get<NavigationService>()
-                  //     .onTaskScreen(task: widget.task);
                 },
                 icon: Icon(
                   Icons.info_outline,
