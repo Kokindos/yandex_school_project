@@ -22,8 +22,6 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: animatedlist
-
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: const Icon(
@@ -57,7 +55,7 @@ class TaskListScreen extends StatelessWidget {
                     navigatorCallback: navigatorCallback,
                     tasks: state.tasks,
                   );
-                } else  {
+                } else {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
@@ -98,18 +96,21 @@ class _TaskListPageState extends State<_TaskListPage> {
     setState(() {
       this.showDoneTasks = showDoneTasks;
     });
+    List<Task> newlist = List.from(widget.tasks);
+    newlist.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
     if (showDoneTasks) {
-      return widget.tasks;
+      return newlist;
     } else {
-      return widget.tasks.where((element) => element.done == false).toList();
+      return newlist.where((element) => element.done == false).toList();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => Future(() =>
-          BlocProvider.of<TaskListBloc>(context).add(const GetListEvent())),
+      onRefresh: () => Future(() {
+        BlocProvider.of<TaskListBloc>(context).add(const GetListEvent());
+      }),
       child: CustomScrollView(
         slivers: [
           SliverPersistentHeader(

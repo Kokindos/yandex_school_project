@@ -26,37 +26,41 @@ class TaskNetworkRepository implements TaskRepository {
   @override
   Future<Task> createTask({required Task task}) async {
     final tasklist = await _networkTaskBackend.getRevision();
-    sharedPrefService.saveRevision(revision: tasklist.revision);
-    return _networkTaskBackend.createTask(
+    final newTask = await _networkTaskBackend.createTask(
         task: task, revision: tasklist.revision);
+    sharedPrefService.saveRevision(revision: tasklist.revision);
+    return newTask;
   }
 
   @override
   Future<Task> deleteTask({required String id}) async {
     final response = await _networkTaskBackend.getRevision();
+    final deletedtask = await _networkTaskBackend.deleteTask(
+        revision: response.revision, id: id);
     sharedPrefService.saveRevision(revision: response.revision);
-    return _networkTaskBackend.deleteTask(revision: response.revision, id: id);
+    return deletedtask;
   }
 
   @override
   Future<Task> editTask({required Task task}) async {
     final response = await _networkTaskBackend.getRevision();
-    sharedPrefService.saveRevision(revision: response.revision);
-    return _networkTaskBackend.editTask(
+    final newtask = await _networkTaskBackend.editTask(
         task: task, revision: response.revision);
+    sharedPrefService.saveRevision(revision: response.revision);
+    return newtask;
   }
 
   @override
   Future<Task> getTask({required String id}) async {
     final response = await _networkTaskBackend.getRevision();
-    sharedPrefService.saveRevision(revision: response.revision);
     return _networkTaskBackend.getTask(revision: response.revision, id: id);
   }
 
   Future<List<Task>> updateList(
       {required List<Task> taskList, required int revision}) async {
-    sharedPrefService.saveRevision(revision: revision);
-    return _networkTaskBackend.updateList(
+    final newTaskList = await _networkTaskBackend.updateList(
         taskList: taskList, revision: revision);
+    sharedPrefService.saveRevision(revision: revision);
+    return newTaskList;
   }
 }
