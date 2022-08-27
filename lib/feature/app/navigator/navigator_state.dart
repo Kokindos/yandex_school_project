@@ -2,18 +2,17 @@ import 'package:done/feature/app/models/task.dart';
 
 abstract class NavigatorConfigState {}
 
-
 class NavigatorListState extends NavigatorConfigState {}
 
-
-
 class NavigatorTaskState extends NavigatorConfigState {
-  final String id;
+  //final Task? task;
+  final bool isNew;
 
-  NavigatorTaskState({required this.id});
+  final String? id;
+
+  NavigatorTaskState({required this.id, this.isNew = false});
 }
 
-
-
-class NavigatorNewTaskState extends NavigatorConfigState {
-}
+// class NavigatorNewTaskState extends NavigatorConfigState {
+//
+// }

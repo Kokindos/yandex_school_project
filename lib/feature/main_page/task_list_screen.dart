@@ -43,7 +43,7 @@ class TaskListScreen extends StatelessWidget {
               if (state is TaskListErrorState) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Try again'),
+                    content: Text('Error, try again'),
                   ),
                 );
               }

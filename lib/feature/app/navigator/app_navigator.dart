@@ -9,11 +9,12 @@ class AppNavigator {
   final NavigationInformationParser routeInforamtionParser;
 
   AppNavigator({
-    required Task task,
+    required Task? task,
     required BehaviorSubject<List<Task>> tasksStream,
   })  : navigationDelegate = NavigationDelegate(
           task: task,
           tasksStream: tasksStream,
+          isFirst: true,
         ),
         routeInforamtionParser = NavigationInformationParser();
 }

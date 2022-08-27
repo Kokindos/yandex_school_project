@@ -8,13 +8,15 @@ import 'package:rxdart/rxdart.dart';
 class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NavigatorConfigState> {
   Task? task;
-  var isNew = false;
+  late bool isNew = true;
+  late bool isFirst;
 
   final BehaviorSubject<List<Task>> tasksStream;
 
   NavigationDelegate({
     required this.task,
     required this.tasksStream,
+    required this.isFirst,
   });
 
   void openList() {
@@ -29,12 +31,19 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     notifyListeners();
   }
 
+  void editTask(Task task) {
+    task = task;
+    isNew = false;
+    notifyListeners();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
       onPopPage: (route, result) => route.didPop(result),
       pages: [
+        if (isFirst)
         MaterialPage(
           child: TaskListScreen(
             navigatorCallback: (t) {
@@ -51,13 +60,6 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
               isNew: isNew,
             ),
           ),
-        if (task == Task.initial())
-          MaterialPage(
-            child: TaskEditScreen(
-              task: task,
-              isNew: isNew,
-            ),
-          ),
       ],
     );
   }
@@ -68,14 +70,22 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
   @override
   Future<void> setNewRoutePath(NavigatorConfigState configuration) async {
     if (configuration is NavigatorTaskState) {
-      final tasks = tasksStream.value;
-      final index =
-          tasks.indexWhere((element) => element.id == configuration.id);
-      if (index != -1) {
-        task = tasks[index];
+      if (configuration.id != null) {
+        final tasks = tasksStream.value;
+        try {
+          task = tasks.firstWhere((element) => element.id == configuration.id);
+          isNew = false;
+        } catch (e) {
+          task = Task.initial();
+          isNew = true;
+        }
+      } else {
+        task = Task.initial();
+        isNew = true;
       }
     } else {
       task = null;
+      isNew = true;
     }
     notifyListeners();
   }

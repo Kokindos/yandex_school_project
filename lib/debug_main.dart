@@ -23,14 +23,13 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   await Hive.initFlutter();
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(PriorityAdapter());
   await Hive.openBox<Task>('tasks');
   runApp(
     const App(
-      isDebug: false,
+      isDebug: true,
     ),
   );
 }

@@ -11,10 +11,10 @@ class NavigationInformationParser
   RouteInformation? restoreRouteInformation(
       NavigatorConfigState configuration) {
     if (configuration is NavigatorTaskState) {
-      return RouteInformation(location: '/editscreen/${configuration.id}');
-    } else if (configuration is NavigatorNewTaskState) {
-      return const RouteInformation(location: '/create');
-    } else {
+      return RouteInformation(
+          location: '/editscreen/${configuration.id}');
+    }
+    else {
       return const RouteInformation(location: '/listscreen');
     }
   }
@@ -35,8 +35,7 @@ class NavigationInformationParser
             //return NavigatorTaskState(id: url.pathSegments[1]);
           }
         } else if (url.pathSegments.first == 'create') {
-          final task = Task.initial();
-          return NavigatorNewTaskState();
+          return NavigatorTaskState(id: null,isNew: true);
         }
       }
     }

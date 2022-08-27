@@ -2,7 +2,8 @@
     package="com.example.yandex_project">
    <application
 
-        android:label="yandex_project"
+
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

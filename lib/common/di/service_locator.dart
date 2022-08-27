@@ -30,7 +30,8 @@ class ServiceLocator {
       ..add(const GetListEvent());
 
     appNavigator = AppNavigator(
-      task: Task.initial(),
+      task: null,
+      //Task.initial(),
       tasksStream: bloc.state.when(
         loaded: (list) => BehaviorSubject.seeded(list),
         loading: () => BehaviorSubject.seeded([]),
