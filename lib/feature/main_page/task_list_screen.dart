@@ -1,5 +1,6 @@
 import 'package:done/common/services/remote_config_service.dart';
 import 'package:done/common/services/theme_provider.dart';
+import 'package:diffutil_sliverlist/diffutil_sliverlist.dart';
 import 'package:done/feature/app/navigator/app_navigator.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:done/feature/app/models/priority.dart';
 import 'package:done/feature/app/models/task.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 class TaskListScreen extends StatelessWidget {
   const TaskListScreen({
@@ -29,39 +31,36 @@ class TaskListScreen extends StatelessWidget {
           color: Colors.white,
         ),
         onPressed: () {
-          GetIt.I.get<AppNavigator>().navigationDelegate.createNewTask();
+          GetIt.I
+              .get<AppNavigator>()
+              .navigationDelegate
+              .createNewTask();
         },
       ),
       body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.only(
-            left: 8,
-            right: 8,
-          ),
-          child: BlocListener<TaskListBloc, TaskListState>(
-            listener: (context, state) {
-              if (state is TaskListErrorState) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Error, try again'),
-                  ),
+        child: BlocListener<TaskListBloc, TaskListState>(
+          listener: (context, state) {
+            if (state is TaskListErrorState) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Error, try again'),
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<TaskListBloc, TaskListState>(
+            builder: (context, state) {
+              if (state is TaskListLoadedState) {
+                return _TaskListPage(
+                  navigatorCallback: navigatorCallback,
+                  tasks: state.tasks,
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
               }
             },
-            child: BlocBuilder<TaskListBloc, TaskListState>(
-              builder: (context, state) {
-                if (state is TaskListLoadedState) {
-                  return _TaskListPage(
-                    navigatorCallback: navigatorCallback,
-                    tasks: state.tasks,
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            ),
           ),
         ),
       ),
@@ -108,9 +107,10 @@ class _TaskListPageState extends State<_TaskListPage> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => Future(() {
-        BlocProvider.of<TaskListBloc>(context).add(const GetListEvent());
-      }),
+      onRefresh: () =>
+          Future(() {
+            BlocProvider.of<TaskListBloc>(context).add(const GetListEvent());
+          }),
       child: CustomScrollView(
         slivers: [
           SliverPersistentHeader(
@@ -123,52 +123,80 @@ class _TaskListPageState extends State<_TaskListPage> {
             pinned: true,
             floating: true,
           ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Material(
-                borderRadius: BorderRadius.circular(16),
-                elevation: 2.2,
-                shadowColor: Colors.black54,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Theme.of(context).backgroundColor,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 7),
-                  child: Column(
-                    children: [
-                      for (var task
-                          in showFilteredList(showDoneTasks: showDoneTasks))
-                        _Item(
-                          task: task,
-                          navigatorCallback: widget.navigatorCallback,
+          SliverPadding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            sliver: SliverStack(
+              children: [
+                SliverPositioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme
+                          .of(context)
+                          .backgroundColor,
+                      boxShadow: const <BoxShadow>[
+                        BoxShadow(
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                          color: Color.fromRGBO(0, 0, 0, 0.12),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 36),
-                        child: TextField(
-                          textCapitalization: TextCapitalization.sentences,
-                          textInputAction: TextInputAction.done,
-                          controller: textEditingController,
-                          onSubmitted: (value) {
-                            if (textEditingController.text != '') {
-                              BlocProvider.of<TaskListBloc>(context).add(
-                                  CreateTaskEvent(textEditingController.text));
-                              textEditingController.clear();
-                            }
-                          },
-                          maxLines: null,
-                          minLines: 1,
-                          keyboardType: TextInputType.multiline,
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!.newTask,
-                          ),
-                        ),
-                      ),
-                    ],
+                        BoxShadow(
+                          offset: Offset(0, 0),
+                          color: Color.fromRGBO(0, 0, 0, 0.06),
+                        )
+                      ],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
-              ),
-            ]),
+                MultiSliver(
+                  children: [
+                    DiffUtilSliverList<Task>(
+                      items: widget.tasks,
+                      builder: ( context, item) =>
+                        _Item(
+                          key: ValueKey(item.id),
+                          task: item,
+                          navigatorCallback: widget.navigatorCallback,
+                        ),
+                      insertAnimationBuilder: (context, animation, child) =>
+                          SizeTransition(
+                            sizeFactor: animation,
+                            //scale: animation,
+                            child: child,
+                          ),
+                      removeAnimationBuilder: (context, animation, child) =>
+                          SizeTransition(
+                            sizeFactor: animation,
+                            child: child,
+                          ),
+                      removeAnimationDuration: const Duration(milliseconds: 150),
+                      insertAnimationDuration: const Duration(milliseconds: 300),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 36),
+                      child: TextField(
+                        textCapitalization: TextCapitalization.sentences,
+                        textInputAction: TextInputAction.done,
+                        controller: textEditingController,
+                        onSubmitted: (value) {
+                          if (textEditingController.text != '') {
+                            BlocProvider.of<TaskListBloc>(context).add(
+                                CreateTaskEvent(textEditingController.text));
+                            textEditingController.clear();
+                          }
+                        },
+                        maxLines: null,
+                        minLines: 1,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.newTask,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           const SliverToBoxAdapter(
             child: SizedBox(
@@ -220,13 +248,18 @@ class _ItemState extends State<_Item> {
       onUpdate: (d) {
         setState(() {
           leftIconPadding =
-              27 + d.progress * (MediaQuery.of(context).size.width / 2 - 54);
+              27 + d.progress * (MediaQuery
+                  .of(context)
+                  .size
+                  .width / 2 - 54);
         });
       },
       confirmDismiss: dismissDirectionFunc,
       onDismissed: (direction) {},
       secondaryBackground: Container(
-        color: Theme.of(context).errorColor,
+        color: Theme
+            .of(context)
+            .errorColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -242,7 +275,9 @@ class _ItemState extends State<_Item> {
       ),
       key: ObjectKey(widget.task),
       background: Container(
-        color: Theme.of(context).toggleableActiveColor,
+        color: Theme
+            .of(context)
+            .toggleableActiveColor,
         child: Row(
           children: [
             SizedBox(
@@ -256,11 +291,12 @@ class _ItemState extends State<_Item> {
         ),
       ),
       child: GestureDetector(
-        onTap: () => BlocProvider.of<TaskListBloc>(context).add(
-          EditTaskEvent(
-            task: widget.task.copyWith(done: !widget.task.done),
-          ),
-        ),
+        onTap: () =>
+            BlocProvider.of<TaskListBloc>(context).add(
+              EditTaskEvent(
+                task: widget.task.copyWith(done: !widget.task.done),
+              ),
+            ),
         child: Container(
           color: Colors.transparent,
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -291,8 +327,12 @@ class _ItemState extends State<_Item> {
                     side: BorderSide(
                         width: 2,
                         color: widget.task.importance == Priority.important
-                            ? GetIt.I.get<RemoteConfigService>().getColor
-                            : Theme.of(context).dividerColor),
+                            ? GetIt.I
+                            .get<RemoteConfigService>()
+                            .getColor
+                            : Theme
+                            .of(context)
+                            .dividerColor),
                   ),
                 ],
               ),
@@ -307,7 +347,8 @@ class _ItemState extends State<_Item> {
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                           widget.task.text,
-                          style: Theme.of(context)
+                          style: Theme
+                              .of(context)
                               .textTheme
                               .overline!
                               .copyWith(decoration: TextDecoration.lineThrough),
@@ -320,7 +361,7 @@ class _ItemState extends State<_Item> {
                                 if (widget.task.importance == Priority.low)
                                   Padding(
                                     padding:
-                                        const EdgeInsets.only(right: 6, top: 3),
+                                    const EdgeInsets.only(right: 6, top: 3),
                                     child: SvgPicture.asset(
                                       'lib/assets/icons/icon_low.svg',
                                       allowDrawingOutsideViewBox: true,
@@ -348,19 +389,23 @@ class _ItemState extends State<_Item> {
                       if (widget.task.deadline != null)
                         Text(
                           DateFormat('d MMMM y',
-                                  AppLocalizations.of(context)?.localeName)
+                              AppLocalizations
+                                  .of(context)
+                                  ?.localeName)
                               .format(
                             DateTime.fromMicrosecondsSinceEpoch(
                                 widget.task.deadline!),
                           ),
-                          style: Theme.of(context)
+                          style: Theme
+                              .of(context)
                               .textTheme
                               .subtitle2!
                               .copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .overline!
-                                      .color),
+                              color: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .overline!
+                                  .color),
                         ),
                     ],
                   ),
@@ -379,7 +424,9 @@ class _ItemState extends State<_Item> {
                 },
                 icon: Icon(
                   Icons.info_outline,
-                  color: Theme.of(context).hintColor,
+                  color: Theme
+                      .of(context)
+                      .hintColor,
                 ),
               ),
             ],
@@ -404,11 +451,9 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
   final Function(bool showDoneTasks) callback;
 
   @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
+  Widget build(BuildContext context,
+      double shrinkOffset,
+      bool overlapsContent,) {
     final progress = shrinkOffset / maxExtent;
     return Material(
       elevation: shrinkOffset < delta ? 0 : 4,
@@ -416,14 +461,22 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
         fit: StackFit.expand,
         children: [
           AnimatedContainer(
-            color: Theme.of(context).scaffoldBackgroundColor,
+            color: Theme
+                .of(context)
+                .scaffoldBackgroundColor,
             duration: const Duration(milliseconds: 30),
             padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 82),
                 const EdgeInsets.only(left: 16, top: 16), progress),
             child: Text(
               AppLocalizations.of(context)!.myTasks,
-              style: TextStyle.lerp(Theme.of(context).textTheme.headline1!,
-                  Theme.of(context).textTheme.headline2!, progress),
+              style: TextStyle.lerp(Theme
+                  .of(context)
+                  .textTheme
+                  .headline1!,
+                  Theme
+                      .of(context)
+                      .textTheme
+                      .headline2!, progress),
             ),
           ),
           Container(
@@ -434,9 +487,15 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
               duration: const Duration(milliseconds: 1),
               child: Text(
                 '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
-                style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyText2!
+                    .copyWith(
+                  color: Theme
+                      .of(context)
+                      .hintColor,
+                ),
               ),
             ),
           ),
@@ -444,7 +503,7 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
             bottom: 4,
             right: -9,
             child:
-                _HideButton(showDoneTasks: showDoneTasks, callback: callback),
+            _HideButton(showDoneTasks: showDoneTasks, callback: callback),
           ),
         ],
       ),
@@ -484,7 +543,9 @@ class _HideButton extends StatelessWidget {
           icon: showDoneTasks
               ? const Icon(Icons.visibility)
               : const Icon(Icons.visibility_off),
-          color: Theme.of(context).primaryColor,
+          color: Theme
+              .of(context)
+              .primaryColor,
         ),
       );
     }
