@@ -410,67 +410,44 @@ class _AppBarDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final progress = shrinkOffset / maxExtent;
-    return Consumer<ThemeProvider>(
-      builder: (context, ThemeProvider themeNotifier, child) {
-        return Material(
-          elevation: shrinkOffset < delta ? 0 : 4,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              AnimatedContainer(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                duration: const Duration(milliseconds: 30),
-                padding: EdgeInsets.lerp(
-                    const EdgeInsets.only(left: 52, top: 82),
-                    const EdgeInsets.only(left: 16, top: 16),
-                    progress),
-                child: Text(
-                  AppLocalizations.of(context)!.myTasks,
-                  style: TextStyle.lerp(Theme.of(context).textTheme.headline1!,
-                      Theme.of(context).textTheme.headline2!, progress),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.lerp(
-                    const EdgeInsets.only(left: 52, top: 126),
-                    const EdgeInsets.only(left: 16, top: 25),
-                    progress),
-                child: AnimatedOpacity(
-                  opacity: 1 - progress,
-                  duration: const Duration(milliseconds: 1),
-                  child: Text(
-                    '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
-                    style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                          color: Theme.of(context).hintColor,
-                        ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 4,
-                right: -9,
-                child: _HideButton(
-                    showDoneTasks: showDoneTasks, callback: callback),
-              ),
-              Positioned(
-                right: 8,
-                top: 24,
-                child: IconButton(
-                  icon: Icon(themeNotifier.isDark
-                      ? Icons.nightlight_round_outlined
-                      : Icons.wb_sunny),
-                  color: themeNotifier.isDark ? Colors.white : Colors.black,
-                  onPressed: () {
-                    themeNotifier.isDark
-                        ? themeNotifier.isDark = false
-                        : themeNotifier.isDark = true;
-                  },
-                ),
-              ),
-            ],
+    return Material(
+      elevation: shrinkOffset < delta ? 0 : 4,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedContainer(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            duration: const Duration(milliseconds: 30),
+            padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 82),
+                const EdgeInsets.only(left: 16, top: 16), progress),
+            child: Text(
+              AppLocalizations.of(context)!.myTasks,
+              style: TextStyle.lerp(Theme.of(context).textTheme.headline1!,
+                  Theme.of(context).textTheme.headline2!, progress),
+            ),
           ),
-        );
-      },
+          Container(
+            padding: EdgeInsets.lerp(const EdgeInsets.only(left: 52, top: 126),
+                const EdgeInsets.only(left: 16, top: 25), progress),
+            child: AnimatedOpacity(
+              opacity: 1 - progress,
+              duration: const Duration(milliseconds: 1),
+              child: Text(
+                '${AppLocalizations.of(context)!.done} - $doneTasksCounter',
+                style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                      color: Theme.of(context).hintColor,
+                    ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 4,
+            right: -9,
+            child:
+                _HideButton(showDoneTasks: showDoneTasks, callback: callback),
+          ),
+        ],
+      ),
     );
   }
 

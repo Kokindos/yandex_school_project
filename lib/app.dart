@@ -33,33 +33,25 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return BlocProvider<TaskListBloc>(
       create: (_) => locator.bloc,
-      child: ChangeNotifierProvider(
-        create: (_) => ThemeProvider(),
-        child: OverlaySupport.global(
-          child: Consumer<ThemeProvider>(
-            builder: (context, ThemeProvider theme, child) {
-              return ChangeNotifierProvider<NavigationDelegate>.value(
-                value: locator.appNavigator.navigationDelegate,
-                child: Consumer<NavigationDelegate>(
-                    builder: (context, delegate, _) {
-                  return MaterialApp.router(
-                    debugShowCheckedModeBanner: widget.isDebug,
-                    localizationsDelegates:
-                        AppLocalizations.localizationsDelegates,
-                    supportedLocales: const [
-                      Locale('en'),
-                      Locale('ru'),
-                    ],
-                    theme:
-                        theme.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
-                    routeInformationParser:
-                        locator.appNavigator.routeInforamtionParser,
-                    routerDelegate: delegate,
-                  );
-                }),
-              );
-            },
-          ),
+      child: OverlaySupport.global(
+        child: ChangeNotifierProvider<NavigationDelegate>.value(
+          value: locator.appNavigator.navigationDelegate,
+          child: Consumer<NavigationDelegate>(builder: (context, delegate, _) {
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: widget.isDebug,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: const [
+                Locale('en'),
+                Locale('ru'),
+              ],
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: ThemeMode.system,
+              routeInformationParser:
+                  locator.appNavigator.routeInforamtionParser,
+              routerDelegate: delegate,
+            );
+          }),
         ),
       ),
     );
