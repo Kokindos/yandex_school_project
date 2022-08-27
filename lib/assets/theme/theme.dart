@@ -5,11 +5,26 @@ abstract class AppTheme {
   static const _primaryTextColorDark = Color(0xFFFFFFFF);
   static const _tertiaryLight = Color(0x4D000000);
   static const _tertiaryDark = Color(0x66FFFFFF);
-  static const _primaryColor = Color(0xFF007AFF);
+  static const _primaryColorLight = Color(0xFF007AFF);
+  static const _primaryColorDark = Color(0xFF0A84FF);
   static const red = Color(0xFFFF3B30);
   static const green = Color(0xFF34C759);
+  static const _redLight = Color(0xFFFF3B30);
+  static const _redDark = Color(0xFFFF453A);
+  static const _greenLight = Color(0xFF34C759);
+  static const _greenDark = Color(0xFF32D74B);
+
 
   static ThemeData get lightTheme => ThemeData(
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: _primaryColorLight),
+        toggleableActiveColor: _greenLight,
+        errorColor: _redLight,
+        colorScheme: const ColorScheme.light(
+          primary: _primaryColorLight,
+          onPrimary: Colors.white,
+          onSurface: _primaryTextColorLight,
+        ),
         disabledColor: const Color(0x26000000),
         inputDecorationTheme: const InputDecorationTheme(
           enabledBorder: OutlineInputBorder(
@@ -30,7 +45,7 @@ abstract class AppTheme {
           elevation: 0,
           iconTheme: IconThemeData(color: _primaryTextColorLight),
         ),
-        primaryColor: _primaryColor,
+        primaryColor: _primaryColorLight,
         dividerColor: Colors.black.withOpacity(.2),
         checkboxTheme: CheckboxThemeData(
           checkColor: MaterialStateProperty.all(
@@ -82,6 +97,16 @@ abstract class AppTheme {
       );
 
   static ThemeData get darkTheme => ThemeData(
+    toggleableActiveColor: _greenDark,
+        errorColor: _redDark,
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            backgroundColor: _primaryColorDark),
+        colorScheme: const ColorScheme.dark(
+          surface: _primaryColorDark,
+          primary: _primaryColorDark,
+          onPrimary: Colors.white,
+          onSurface: _primaryTextColorDark,
+        ),
         disabledColor: const Color(0x26FFFFFF),
         inputDecorationTheme: const InputDecorationTheme(
           enabledBorder: OutlineInputBorder(
@@ -102,7 +127,7 @@ abstract class AppTheme {
           elevation: 0,
           iconTheme: IconThemeData(color: _primaryTextColorDark),
         ),
-        primaryColor: _primaryColor,
+        primaryColor: _primaryColorDark,
         dividerColor: Colors.white.withOpacity(.2),
         checkboxTheme: CheckboxThemeData(
           checkColor: MaterialStateProperty.all(

@@ -20,17 +20,26 @@ Task _$TaskFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Task {
+  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
+  @HiveField(1)
   String get text => throw _privateConstructorUsedError;
+  @HiveField(2)
   bool get done => throw _privateConstructorUsedError;
+  @HiveField(3)
   Priority get importance => throw _privateConstructorUsedError;
+  @HiveField(4)
   int? get deadline => throw _privateConstructorUsedError;
+  @HiveField(5)
   String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: "created_at")
+  @HiveField(6)
   int? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: "changed_at")
+  @HiveField(7)
   int? get changedAt => throw _privateConstructorUsedError;
   @JsonKey(name: "last_updated_by")
+  @HiveField(8)
   String? get lastUpdatedBy => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -43,15 +52,15 @@ abstract class $TaskCopyWith<$Res> {
   factory $TaskCopyWith(Task value, $Res Function(Task) then) =
       _$TaskCopyWithImpl<$Res>;
   $Res call(
-      {String id,
-      String text,
-      bool done,
-      Priority importance,
-      int? deadline,
-      String? color,
-      @JsonKey(name: "created_at") int? createdAt,
-      @JsonKey(name: "changed_at") int? changedAt,
-      @JsonKey(name: "last_updated_by") String? lastUpdatedBy});
+      {@HiveField(0) String id,
+      @HiveField(1) String text,
+      @HiveField(2) bool done,
+      @HiveField(3) Priority importance,
+      @HiveField(4) int? deadline,
+      @HiveField(5) String? color,
+      @JsonKey(name: "created_at") @HiveField(6) int? createdAt,
+      @JsonKey(name: "changed_at") @HiveField(7) int? changedAt,
+      @JsonKey(name: "last_updated_by") @HiveField(8) String? lastUpdatedBy});
 }
 
 /// @nodoc
@@ -121,15 +130,15 @@ abstract class _$$_TaskCopyWith<$Res> implements $TaskCopyWith<$Res> {
       __$$_TaskCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String id,
-      String text,
-      bool done,
-      Priority importance,
-      int? deadline,
-      String? color,
-      @JsonKey(name: "created_at") int? createdAt,
-      @JsonKey(name: "changed_at") int? changedAt,
-      @JsonKey(name: "last_updated_by") String? lastUpdatedBy});
+      {@HiveField(0) String id,
+      @HiveField(1) String text,
+      @HiveField(2) bool done,
+      @HiveField(3) Priority importance,
+      @HiveField(4) int? deadline,
+      @HiveField(5) String? color,
+      @JsonKey(name: "created_at") @HiveField(6) int? createdAt,
+      @JsonKey(name: "changed_at") @HiveField(7) int? changedAt,
+      @JsonKey(name: "last_updated_by") @HiveField(8) String? lastUpdatedBy});
 }
 
 /// @nodoc
@@ -196,40 +205,50 @@ class __$$_TaskCopyWithImpl<$Res> extends _$TaskCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
+@HiveType(typeId: 0, adapterName: 'TaskAdapter')
 class _$_Task implements _Task {
   const _$_Task(
-      {required this.id,
-      required this.text,
-      required this.done,
-      required this.importance,
-      this.deadline,
-      this.color,
-      @JsonKey(name: "created_at") this.createdAt,
-      @JsonKey(name: "changed_at") this.changedAt,
-      @JsonKey(name: "last_updated_by") this.lastUpdatedBy});
+      {@HiveField(0) required this.id,
+      @HiveField(1) required this.text,
+      @HiveField(2) required this.done,
+      @HiveField(3) required this.importance,
+      @HiveField(4) this.deadline,
+      @HiveField(5) this.color,
+      @JsonKey(name: "created_at") @HiveField(6) this.createdAt,
+      @JsonKey(name: "changed_at") @HiveField(7) this.changedAt,
+      @JsonKey(name: "last_updated_by") @HiveField(8) this.lastUpdatedBy});
 
   factory _$_Task.fromJson(Map<String, dynamic> json) => _$$_TaskFromJson(json);
 
   @override
+  @HiveField(0)
   final String id;
   @override
+  @HiveField(1)
   final String text;
   @override
+  @HiveField(2)
   final bool done;
   @override
+  @HiveField(3)
   final Priority importance;
   @override
+  @HiveField(4)
   final int? deadline;
   @override
+  @HiveField(5)
   final String? color;
   @override
   @JsonKey(name: "created_at")
+  @HiveField(6)
   final int? createdAt;
   @override
   @JsonKey(name: "changed_at")
+  @HiveField(7)
   final int? changedAt;
   @override
   @JsonKey(name: "last_updated_by")
+  @HiveField(8)
   final String? lastUpdatedBy;
 
   @override
@@ -284,38 +303,59 @@ class _$_Task implements _Task {
 
 abstract class _Task implements Task {
   const factory _Task(
-      {required final String id,
-      required final String text,
-      required final bool done,
-      required final Priority importance,
-      final int? deadline,
-      final String? color,
-      @JsonKey(name: "created_at") final int? createdAt,
-      @JsonKey(name: "changed_at") final int? changedAt,
-      @JsonKey(name: "last_updated_by") final String? lastUpdatedBy}) = _$_Task;
+      {@HiveField(0)
+          required final String id,
+      @HiveField(1)
+          required final String text,
+      @HiveField(2)
+          required final bool done,
+      @HiveField(3)
+          required final Priority importance,
+      @HiveField(4)
+          final int? deadline,
+      @HiveField(5)
+          final String? color,
+      @JsonKey(name: "created_at")
+      @HiveField(6)
+          final int? createdAt,
+      @JsonKey(name: "changed_at")
+      @HiveField(7)
+          final int? changedAt,
+      @JsonKey(name: "last_updated_by")
+      @HiveField(8)
+          final String? lastUpdatedBy}) = _$_Task;
 
   factory _Task.fromJson(Map<String, dynamic> json) = _$_Task.fromJson;
 
   @override
+  @HiveField(0)
   String get id;
   @override
+  @HiveField(1)
   String get text;
   @override
+  @HiveField(2)
   bool get done;
   @override
+  @HiveField(3)
   Priority get importance;
   @override
+  @HiveField(4)
   int? get deadline;
   @override
+  @HiveField(5)
   String? get color;
   @override
   @JsonKey(name: "created_at")
+  @HiveField(6)
   int? get createdAt;
   @override
   @JsonKey(name: "changed_at")
+  @HiveField(7)
   int? get changedAt;
   @override
   @JsonKey(name: "last_updated_by")
+  @HiveField(8)
   String? get lastUpdatedBy;
   @override
   @JsonKey(ignore: true)
