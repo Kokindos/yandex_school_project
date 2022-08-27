@@ -51,6 +51,13 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
               isNew: isNew,
             ),
           ),
+        if (task == Task.initial())
+          MaterialPage(
+            child: TaskEditScreen(
+              task: task,
+              isNew: isNew,
+            ),
+          ),
       ],
     );
   }

@@ -36,10 +36,20 @@ class TaskListScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Container(
-            padding: const EdgeInsets.only(
-              left: 8,
-              right: 8,
-            ),
+          padding: const EdgeInsets.only(
+            left: 8,
+            right: 8,
+          ),
+          child: BlocListener<TaskListBloc, TaskListState>(
+            listener: (context, state) {
+              if (state is TaskListErrorState) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Try again'),
+                  ),
+                );
+              }
+            },
             child: BlocBuilder<TaskListBloc, TaskListState>(
               builder: (context, state) {
                 if (state is TaskListLoadedState) {
@@ -47,18 +57,15 @@ class TaskListScreen extends StatelessWidget {
                     navigatorCallback: navigatorCallback,
                     tasks: state.tasks,
                   );
-                } else if (state is TaskListErrorState) {
-                   return
-                  Center(
-                    child: Text('$state.message'),
-                  );
-                } else {
+                } else  {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
               },
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -72,7 +79,6 @@ class _TaskListPage extends StatefulWidget {
 
   final List<Task> tasks;
   final Function(Task task) navigatorCallback;
-
 
   @override
   State<_TaskListPage> createState() => _TaskListPageState();
@@ -132,7 +138,10 @@ class _TaskListPageState extends State<_TaskListPage> {
                     children: [
                       for (var task
                           in showFilteredList(showDoneTasks: showDoneTasks))
-                        _Item(task: task, navigatorCallback: widget.navigatorCallback,),
+                        _Item(
+                          task: task,
+                          navigatorCallback: widget.navigatorCallback,
+                        ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 36),
                         child: TextField(
@@ -176,7 +185,11 @@ class _Item extends StatefulWidget {
 
   final Task task;
 
-  const _Item({Key? key, required this.task, required this.navigatorCallback,}) : super(key: key);
+  const _Item({
+    Key? key,
+    required this.task,
+    required this.navigatorCallback,
+  }) : super(key: key);
 
   @override
   State<_Item> createState() => _ItemState();
