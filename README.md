@@ -23,4 +23,4 @@ Done - Flutter-приложение, с помощью которого можн
 * GitHub Actions
 
 ## Download
-[app](https://disk.yandex.ru/d/FSZgFcrhkY09rg) 
+[app](https://disk.yandex.ru/d/C1Lb6xADFmTcog) 
