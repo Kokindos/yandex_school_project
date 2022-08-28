@@ -28,7 +28,7 @@ class TaskNetworkRepository implements TaskRepository {
     final tasklist = await _networkTaskBackend.getRevision();
     final newTask = await _networkTaskBackend.createTask(
         task: task, revision: tasklist.revision);
-    sharedPrefService.saveRevision(revision: tasklist.revision);
+    sharedPrefService.saveRevision(revision: tasklist.revision+1);
     return newTask;
   }
 
@@ -37,7 +37,7 @@ class TaskNetworkRepository implements TaskRepository {
     final response = await _networkTaskBackend.getRevision();
     final deletedtask = await _networkTaskBackend.deleteTask(
         revision: response.revision, id: id);
-    sharedPrefService.saveRevision(revision: response.revision);
+    sharedPrefService.saveRevision(revision: response.revision+1);
     return deletedtask;
   }
 
@@ -46,7 +46,7 @@ class TaskNetworkRepository implements TaskRepository {
     final response = await _networkTaskBackend.getRevision();
     final newtask = await _networkTaskBackend.editTask(
         task: task, revision: response.revision);
-    sharedPrefService.saveRevision(revision: response.revision);
+    sharedPrefService.saveRevision(revision: response.revision+1);
     return newtask;
   }
 
@@ -60,7 +60,7 @@ class TaskNetworkRepository implements TaskRepository {
       {required List<Task> taskList, required int revision}) async {
     final newTaskList = await _networkTaskBackend.updateList(
         taskList: taskList, revision: revision);
-    sharedPrefService.saveRevision(revision: revision);
+    sharedPrefService.saveRevision(revision: revision+1);
     return newTaskList;
   }
 }

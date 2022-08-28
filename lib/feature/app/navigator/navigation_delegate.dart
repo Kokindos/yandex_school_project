@@ -19,23 +19,23 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
   });
 
   void openList() {
+    AppMetrica.reportEvent('Navigation transition to TaskListScreen');
     task = null;
     isNew = false;
-    AppMetrica.reportEvent('Navigation transition to TaskListScreen');
     notifyListeners();
   }
 
   void createNewTask() {
+    AppMetrica.reportEvent('Navigation transition to EditTaskScreen to create new task');
     task = Task.initial();
     isNew = true;
-    AppMetrica.reportEvent('Navigation transition to EditTaskScreen to create new task');
     notifyListeners();
   }
 
   void editTask(Task task) {
+    AppMetrica.reportEvent('Navigation transition to EditTaskScreen to edit task');
     task = task;
     isNew = false;
-    AppMetrica.reportEvent('Navigation transition to EditTaskScreen to edit task');
     notifyListeners();
   }
 

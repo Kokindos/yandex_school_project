@@ -48,7 +48,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   Future<void> _onEdit(EditTaskEvent event, Emitter<TaskListState> emit) async {
-    //AppMetrica.reportEvent('Edit task event');
+    AppMetrica.reportEvent('Edit task event');
     try {
       final task = event.task.copyWith(
         changedAt: DateTime.now().microsecondsSinceEpoch,
@@ -78,8 +78,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onCreate(
       CreateTaskEvent event, Emitter<TaskListState> emit) async {
-    //AppMetrica.reportEvent('Create task event');
-    log('ERROR');
+    AppMetrica.reportEvent('Create task event');
     Task task = Task(
       id: const Uuid().v1(),
       text: event.text,
@@ -110,7 +109,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onDelete(
       DeleteTaskEvent event, Emitter<TaskListState> emit) async {
-    //AppMetrica.reportEvent('Delete task event');
+    AppMetrica.reportEvent('Delete task event');
     try {
       if (state is TaskListLoadedState) {
         final currentState = state as TaskListLoadedState;
@@ -135,7 +134,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onGetList(
       GetListEvent event, Emitter<TaskListState> emit) async {
-    //AppMetrica.reportEvent('Get list event');
+    AppMetrica.reportEvent('Get list event');
     emit(
       const TaskListState.loading(),
     );
