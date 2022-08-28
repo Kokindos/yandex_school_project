@@ -16,10 +16,10 @@ Done - Flutter-приложение, с помощью которого можн
 
 ## Integrations
 
-*Firebase Remote Configs
-*Firebase Crashlytics
-*Firebase App Distribution
-*Yandex App Metrica
+* Firebase Remote Configs
+* Firebase Crashlytics
+* Firebase App Distribution
+* Yandex App Metrica
 
 ## Download
 [app](https://disk.yandex.ru/d/FSZgFcrhkY09rg) 
