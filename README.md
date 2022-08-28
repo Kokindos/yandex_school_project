@@ -9,14 +9,17 @@ Done - Flutter-приложение, с помощью которого можн
 * Cоздание, редактирование, удаление задач
 * Cортировка выполненных/невыполненных задач
 * Поддержка двух языков - Русский и English
-
-* Полностью онлайн
+* Темная и светлая тема в зависимости от ваших системных настроек
+* Offline first - при появлении интернета потяните вниз для обновления списка на сервере
+* Возможность перехода сразу на создание таска mytasks.ru/create
 * Переключение цвета важности при перезапуске приложения
 
 ## Integrations
 
-Firebase Remote Configs
-Firebase Crashlytics
+* Firebase Remote Configs
+* Firebase Crashlytics
+* Firebase App Distribution
+* Yandex App Metrica
 
 ## Download
 [app](https://disk.yandex.ru/d/FSZgFcrhkY09rg) 
