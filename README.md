@@ -11,7 +11,7 @@ Done - Flutter-приложение, с помощью которого можн
 * Поддержка двух языков - Русский и English
 * Темная и светлая тема в зависимости от ваших системных настроек
 * Offline first - при появлении интернета потяните вниз для обновления списка на сервере
-* Возможность перехода сразу на создание таска mytasks.ru/create
+* Возможность перехода сразу на создание [задачи](mytasks.ru/create) (необходимо предоставить приложению все разрешения)
 * Переключение цвета важности при перезапуске приложения
 
 ## Integrations
@@ -20,6 +20,7 @@ Done - Flutter-приложение, с помощью которого можн
 * Firebase Crashlytics
 * Firebase App Distribution
 * Yandex App Metrica
+* GitHub Actions
 
 ## Download
 [app](https://disk.yandex.ru/d/FSZgFcrhkY09rg) 
