@@ -29,8 +29,8 @@ void main() async {
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(PriorityAdapter());
   await Hive.openBox<Task>('tasks');
-  // AppMetrica.activate(const AppMetricaConfig(
-  //     'efa0a8e5-44c7-43c4-aa8d-25bd20dfafac'));
+  AppMetrica.activate(const AppMetricaConfig(
+      'efa0a8e5-44c7-43c4-aa8d-25bd20dfafac'));
   runApp(
     const App(
       isDebug: false,

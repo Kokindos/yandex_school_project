@@ -1,11 +1,6 @@
 import 'package:done/assets/theme/theme.dart';
 import 'package:done/common/di/service_locator.dart';
-import 'package:done/common/services/theme_provider.dart';
-import 'package:done/feature/app/models/priority.dart';
-import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
