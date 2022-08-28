@@ -14,7 +14,6 @@ class AppNavigator {
   })  : navigationDelegate = NavigationDelegate(
           task: task,
           tasksStream: tasksStream,
-          isFirst: true,
         ),
         routeInforamtionParser = NavigationInformationParser();
 }

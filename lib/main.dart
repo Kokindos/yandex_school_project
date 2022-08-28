@@ -12,8 +12,6 @@ import 'common/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  AppMetrica.activate(const AppMetricaConfig(
-      '225399c2-c425-4084-b775-63c00a063c79225399c2-c425-4084-b775-63c00a063c79'));
   initLogger();
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -31,6 +29,8 @@ void main() async {
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(PriorityAdapter());
   await Hive.openBox<Task>('tasks');
+  // AppMetrica.activate(const AppMetricaConfig(
+  //     'efa0a8e5-44c7-43c4-aa8d-25bd20dfafac'));
   runApp(
     const App(
       isDebug: false,

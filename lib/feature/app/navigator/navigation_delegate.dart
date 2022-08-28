@@ -10,14 +10,12 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NavigatorConfigState> {
   Task? task;
   late bool isNew = true;
-  late bool isFirst;
 
   final BehaviorSubject<List<Task>> tasksStream;
 
   NavigationDelegate({
     required this.task,
     required this.tasksStream,
-    required this.isFirst,
   });
 
   void openList() {
@@ -47,7 +45,6 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
       key: navigatorKey,
       onPopPage: (route, result) => route.didPop(result),
       pages: [
-        if (isFirst)
         MaterialPage(
           child: TaskListScreen(
             navigatorCallback: (t) {

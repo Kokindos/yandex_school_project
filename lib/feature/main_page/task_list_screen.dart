@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:done/common/services/remote_config_service.dart';
 import 'package:diffutil_sliverlist/diffutil_sliverlist.dart';
 import 'package:done/feature/app/navigator/app_navigator.dart';
@@ -149,7 +151,7 @@ class _TaskListPageState extends State<_TaskListPage> {
                 MultiSliver(
                   children: [
                     DiffUtilSliverList<Task>(
-                      items: widget.tasks,
+                      items: showFilteredList(showDoneTasks: showDoneTasks),
                       builder: ( context, item) =>
                         _Item(
                           key: ValueKey(item.id),
@@ -157,9 +159,9 @@ class _TaskListPageState extends State<_TaskListPage> {
                           navigatorCallback: widget.navigatorCallback,
                         ),
                       insertAnimationBuilder: (context, animation, child) =>
-                          SizeTransition(
-                            sizeFactor: animation,
-                            //scale: animation,
+                          ScaleTransition(
+                            //sizeFactor: animation,
+                            scale: animation,
                             child: child,
                           ),
                       removeAnimationBuilder: (context, animation, child) =>
@@ -168,7 +170,7 @@ class _TaskListPageState extends State<_TaskListPage> {
                             child: child,
                           ),
                       removeAnimationDuration: const Duration(milliseconds: 150),
-                      insertAnimationDuration: const Duration(milliseconds: 300),
+                      insertAnimationDuration: const Duration(milliseconds: 500),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 36),
@@ -532,7 +534,9 @@ class _HideButton extends StatelessWidget {
         padding: const EdgeInsets.only(right: 16),
         child: IconButton(
           onPressed: () {
+            log('ERROR1');
             callback(!showDoneTasks);
+            log('ERROR2');
           },
           icon: showDoneTasks
               ? const Icon(Icons.visibility)
