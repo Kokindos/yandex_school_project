@@ -18,13 +18,6 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     required this.tasksStream,
   });
 
-  void openList() {
-    AppMetrica.reportEvent('Navigation transition to TaskListScreen');
-    task = null;
-    isNew = false;
-    notifyListeners();
-  }
-
   void createNewTask() {
     AppMetrica.reportEvent('Navigation transition to EditTaskScreen to create new task');
     task = Task.initial();
@@ -38,12 +31,24 @@ class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     isNew = false;
     notifyListeners();
   }
-
+  void openList() {
+    AppMetrica.reportEvent('Navigation transition to TaskListScreen');
+    task = null;
+    isNew = false;
+    notifyListeners();
+  }
   @override
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      onPopPage: (route, result) => route.didPop(result),
+      onPopPage: (route, result) {
+        if (!route.didPop(result)) return false;
+        if (task!=null){
+          openList();
+        }
+        popRoute();
+        return true;
+      },
       pages: [
         MaterialPage(
           child: TaskListScreen(

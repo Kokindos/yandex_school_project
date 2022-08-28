@@ -233,7 +233,7 @@ class _ItemState extends State<_Item> {
       return false;
     } else {
       BlocProvider.of<TaskListBloc>(context)
-          .add(DeleteTaskEvent(task: Task.initial()));
+          .add(DeleteTaskEvent(task: widget.task));
       return true;
     }
   }

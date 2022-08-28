@@ -49,7 +49,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   Future<void> _onEdit(EditTaskEvent event, Emitter<TaskListState> emit) async {
-    AppMetrica.reportEvent('Edit task event');
     try {
       final task = event.task.copyWith(
         changedAt: DateTime.now().microsecondsSinceEpoch,
@@ -91,7 +90,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onCreate(
       CreateTaskEvent event, Emitter<TaskListState> emit) async {
-    AppMetrica.reportEvent('Create task event');
+
     Task task = Task(
       id: const Uuid().v1(),
       text: event.text,
@@ -134,7 +133,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onDelete(
       DeleteTaskEvent event, Emitter<TaskListState> emit) async {
-    AppMetrica.reportEvent('Delete task event');
     try {
       if (state is TaskListLoadedState) {
         final currentState = state as TaskListLoadedState;
@@ -157,7 +155,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
             message: e.toString(),
           ),
         );
-        log('ERROR STATE EMITTED');
       }
     } catch (e) {
       final currentState = state as TaskListErrorState;
@@ -172,7 +169,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onGetList(
       GetListEvent event, Emitter<TaskListState> emit) async {
-    AppMetrica.reportEvent('Get list event');
     emit(
       const TaskListState.loading(),
     );
@@ -182,6 +178,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         TaskListState.loaded(tasks: response),
       );
     } on DioError catch (e) {
+      log(e.error.toString());
       final currentState = state as TaskListErrorState;
       if (e.error!=SocketException) {
         emit(

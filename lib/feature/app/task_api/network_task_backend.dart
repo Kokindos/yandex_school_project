@@ -79,7 +79,6 @@ class NetworkTaskBackend implements TaskApi {
 
   @override
   Future<Task> deleteTask({int? revision, required String id}) async {
-    log(id);
     final response = await _client.delete(
       '/list/$id',
       options: Options(

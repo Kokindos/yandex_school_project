@@ -33,6 +33,8 @@ class _AppState extends State<App> {
           value: locator.appNavigator.navigationDelegate,
           child: Consumer<NavigationDelegate>(builder: (context, delegate, _) {
             return MaterialApp.router(
+
+              backButtonDispatcher: RootBackButtonDispatcher(),
               debugShowCheckedModeBanner: widget.isDebug,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: const [
