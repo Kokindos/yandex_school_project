@@ -28,6 +28,7 @@ class TaskConnectRepository implements TaskRepository {
     taskNetworkRepository.deleteTask(id: id);
     return taskLocalRepository.deleteTask(id: id);
   }
+
   @override
   Future<Task> getTask({required String id}) {
     try {
@@ -36,12 +37,14 @@ class TaskConnectRepository implements TaskRepository {
       return taskLocalRepository.getTask(id: id);
     }
   }
+
   @override
   Future<Task> editTask({required Task task}) {
     AppMetrica.reportEvent('Edit task event');
     taskNetworkRepository.editTask(task: task);
     return taskLocalRepository.editTask(task: task);
   }
+
   @override
   Future<List<Task>> getList() async {
     AppMetrica.reportEvent('Get list event');
@@ -55,13 +58,10 @@ class TaskConnectRepository implements TaskRepository {
         return removeResponse.list;
       } else {
         taskNetworkRepository.updateList(
-            taskList: localResponse,
-            revision: removeResponse.revision
-        );
+            taskList: localResponse, revision: removeResponse.revision);
         return localResponse;
       }
-    }
-    catch(e){
+    } catch (e) {
       return localResponse;
     }
   }

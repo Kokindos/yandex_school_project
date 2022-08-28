@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
@@ -71,7 +70,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         await _taskRepository.editTask(task: task);
       }
     } on DioError catch (e) {
-      if (e.error!=SocketException) {
+      if (e.error != SocketException) {
         final currentState = state as TaskListErrorState;
         emit(
           TaskListState.error(
@@ -90,44 +89,45 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
 
   Future<void> _onCreate(
       CreateTaskEvent event, Emitter<TaskListState> emit) async {
+    if (event.text != '') {
+      Task task = Task(
+        id: const Uuid().v1(),
+        text: event.text,
+        done: false,
+        importance: event.importance ?? Priority.basic,
+        deadline: event.deadline,
+        changedAt: DateTime.now().microsecondsSinceEpoch,
+        createdAt: DateTime.now().microsecondsSinceEpoch,
+        lastUpdatedBy: await getDeviceInfo(),
+      );
+      try {
+        if (state is TaskListLoadedState) {
+          final currentState = state as TaskListLoadedState;
+          final List<Task> newTasks = List.from(currentState.tasks);
+          newTasks.add(task);
 
-    Task task = Task(
-      id: const Uuid().v1(),
-      text: event.text,
-      done: false,
-      importance: event.importance ?? Priority.basic,
-      deadline: event.deadline,
-      changedAt: DateTime.now().microsecondsSinceEpoch,
-      createdAt: DateTime.now().microsecondsSinceEpoch,
-      lastUpdatedBy: await getDeviceInfo(),
-    );
-    try {
-      if (state is TaskListLoadedState) {
-        final currentState = state as TaskListLoadedState;
-        final List<Task> newTasks = List.from(currentState.tasks);
-        newTasks.add(task);
-
-        emit(
-          TaskListState.loaded(
-            tasks: newTasks,
-          ),
-        );
-        await _taskRepository.createTask(task: task);
-      }
-    } on DioError catch (e) {
-      if (e.error!=SocketException) {
+          emit(
+            TaskListState.loaded(
+              tasks: newTasks,
+            ),
+          );
+          await _taskRepository.createTask(task: task);
+        }
+      } on DioError catch (e) {
+        if (e.error != SocketException) {
+          final currentState = state as TaskListErrorState;
+          emit(
+            TaskListState.error(
+              tasks: currentState.tasks,
+              message: e.toString(),
+            ),
+          );
+        }
+      } catch (e) {
         final currentState = state as TaskListErrorState;
-        emit(
-          TaskListState.error(
-            tasks: currentState.tasks,
-            message: e.toString(),
-          ),
-        );
+        emit(TaskListState.error(
+            message: e.toString(), tasks: currentState.tasks));
       }
-    } catch (e) {
-      final currentState = state as TaskListErrorState;
-      emit(TaskListState.error(
-          message: e.toString(), tasks: currentState.tasks));
     }
   }
 
@@ -147,7 +147,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         await _taskRepository.deleteTask(id: event.task.id);
       }
     } on DioError catch (e) {
-      if (e.error!=SocketException) {
+      if (e.error != SocketException) {
         final currentState = state as TaskListErrorState;
         emit(
           TaskListState.error(
@@ -180,7 +180,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
     } on DioError catch (e) {
       log(e.error.toString());
       final currentState = state as TaskListErrorState;
-      if (e.error!=SocketException) {
+      if (e.error != SocketException) {
         emit(
           TaskListState.error(
             tasks: currentState.tasks,
