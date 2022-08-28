@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
+import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -70,9 +71,21 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         );
         await _taskRepository.editTask(task: task);
       }
+    } on DioError catch (e) {
+      if (e.error!=SocketException) {
+        final currentState = state as TaskListErrorState;
+        emit(
+          TaskListState.error(
+            tasks: currentState.tasks,
+            message: e.toString(),
+          ),
+        );
+      }
     } catch (e) {
-      emit(TaskListState.error(message: e.toString()));
-      rethrow;
+      final currentState = state as TaskListErrorState;
+      emit(TaskListState.error(
+          message: e.toString(), tasks: currentState.tasks));
+      //rethrow;
     }
   }
 
@@ -102,8 +115,20 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         );
         await _taskRepository.createTask(task: task);
       }
+    } on DioError catch (e) {
+      if (e.error!=SocketException) {
+        final currentState = state as TaskListErrorState;
+        emit(
+          TaskListState.error(
+            tasks: currentState.tasks,
+            message: e.toString(),
+          ),
+        );
+      }
     } catch (e) {
-      emit(TaskListState.error(message: e.toString()));
+      final currentState = state as TaskListErrorState;
+      emit(TaskListState.error(
+          message: e.toString(), tasks: currentState.tasks));
     }
   }
 
@@ -123,9 +148,22 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         );
         await _taskRepository.deleteTask(id: event.task.id);
       }
+    } on DioError catch (e) {
+      if (e.error!=SocketException) {
+        final currentState = state as TaskListErrorState;
+        emit(
+          TaskListState.error(
+            tasks: currentState.tasks,
+            message: e.toString(),
+          ),
+        );
+        log('ERROR STATE EMITTED');
+      }
     } catch (e) {
+      final currentState = state as TaskListErrorState;
       emit(
         TaskListState.error(
+          tasks: currentState.tasks,
           message: e.toString(),
         ),
       );
@@ -143,13 +181,25 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
       emit(
         TaskListState.loaded(tasks: response),
       );
+    } on DioError catch (e) {
+      final currentState = state as TaskListErrorState;
+      if (e.error!=SocketException) {
+        emit(
+          TaskListState.error(
+            tasks: currentState.tasks,
+            message: e.toString(),
+          ),
+        );
+      }
     } catch (e) {
+      final currentState = state as TaskListErrorState;
       emit(
         TaskListState.error(
+          tasks: currentState.tasks,
           message: e.toString(),
         ),
       );
-      rethrow;
+      //rethrow;
     }
   }
 }

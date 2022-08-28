@@ -5,11 +5,14 @@ import 'package:done/feature/app/models/task.dart';
 import 'package:done/feature/app/repositories/task_connect_repository.dart';
 import 'package:done/feature/main_page/bloc/tasklist_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockTaskRepository extends Mock implements TaskConnectRepository {}
 
+class FakeTask extends Fake implements Task {}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   final tasklist = [
     const Task(
         id: '1',
@@ -52,18 +55,28 @@ void main() {
         importance: Priority.important,
         lastUpdatedBy: 'android'),
   ];
-
+  final testTask = tasklist[0];
+  final List<Task> tasklistDeleted = List.from(tasklist);
+  tasklistDeleted.remove(testTask);
   final taskResponse =
       TaskResponse(status: 'ok', element: tasklist[0], revision: 1);
 
-  final testTask = tasklist[0];
-  late TaskListBloc bloc;
-  late MockTaskRepository api;
   group('TaskListBloc', () {
+    late TaskListBloc bloc;
+    late MockTaskRepository api;
+    setUpAll(() {
+      registerFallbackValue(FakeTask());
+    });
     setUp(() {
       api = MockTaskRepository();
       bloc = TaskListBloc(taskRepository: api);
+      when(
+        () => api.getList(),
+      ).thenAnswer((_) async => tasklist);
+      when(() => api.createTask(task: any(named: 'task')))
+          .thenAnswer((_) async => testTask);
     });
+    tearDown(() => bloc.close());
     TaskListBloc blocBuild() {
       return TaskListBloc(taskRepository: api);
     }
@@ -72,7 +85,6 @@ void main() {
       test(
           'on GetListEvent emits TaskListLoadingState and TaskListLoadedState ',
           () {
-        when(api.getList()).thenAnswer((_) async => tasklist);
         bloc.add(const GetListEvent());
         expectLater(
           bloc.stream,
@@ -85,29 +97,38 @@ void main() {
         );
       });
     });
-    // group('DeleteTaskEvent', () {
-    //   blocTest<TaskListBloc, TaskListState>(
-    //     'emits TaskListErrorState when unsuccessful',
-    //     setUp: () {
-    //       when(api.deleteTask(id: ))).thenThrow(Exception('error'));
-    //     },
-    //     build: blocBuild,
-    //     seed: () => TaskListLoadedState(tasks: tasklist),
-    //     act: (bloc) {
-    //       bloc.add(DeleteTaskEvent(task: testTask));
-    //     },
-    //     expect: () => [
-    //       const TaskListErrorState(message: 'error'),
-    //     ],
-    //   );
-    //   blocTest<TaskListBloc, TaskListState>(
-    //     'emits TaskListLoaded when successful',
-    //     setUp: () {
-    //       when(api.deleteTask(id: any.toString()))
-    //           .thenAnswer((_) async => testTask);
-    //     },
-    //     build: blocBuild,
-    //   );
-    // });
+    group('DeleteTaskEvent', () {
+      // blocTest<TaskListBloc, TaskListState>(
+      //   'emits TaskListErrorState when unsuccessful',
+      //   setUp: () {
+      //     when(() => api.deleteTask(id: any(named: 'id')))
+      //         .thenThrow(Exception('error'));
+      //   },
+      //   build: blocBuild,
+      //   seed: () => TaskListLoadedState(tasks: tasklist),
+      //   act: (bloc) {
+      //     bloc.add(DeleteTaskEvent(task: testTask));
+      //   },
+      //   expect: () => [
+      //     const TaskListErrorState(message: 'error'),
+      //   ],
+      // );
+
+      blocTest<TaskListBloc, TaskListState>(
+        'emits state without deleted task',
+        setUp: () {
+          when(() => api.deleteTask(id: any(named: 'id')))
+              .thenAnswer((_) async => testTask);
+        },
+        build: blocBuild,
+        seed: () => TaskListLoadedState(tasks: tasklist),
+        act: (bloc) => bloc.add(
+          DeleteTaskEvent(task: testTask),
+        ),
+        expect: () => [
+          TaskListLoadedState(tasks: tasklistDeleted),
+        ],
+      );
+    });
   });
 }

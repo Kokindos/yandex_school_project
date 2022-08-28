@@ -25,13 +25,6 @@ class TaskConnectRepository implements TaskRepository {
     taskNetworkRepository.deleteTask(id: id);
     return taskLocalRepository.deleteTask(id: id);
   }
-
-  @override
-  Future<Task> editTask({required Task task}) {
-    taskNetworkRepository.editTask(task: task);
-    return taskLocalRepository.editTask(task: task);
-  }
-
   @override
   Future<Task> getTask({required String id}) {
     try {
@@ -40,7 +33,11 @@ class TaskConnectRepository implements TaskRepository {
       return taskLocalRepository.getTask(id: id);
     }
   }
-
+  @override
+  Future<Task> editTask({required Task task}) {
+    taskNetworkRepository.editTask(task: task);
+    return taskLocalRepository.editTask(task: task);
+  }
   @override
   Future<List<Task>> getList() async {
     int localRevision = await sharedPrefService.getRevision();

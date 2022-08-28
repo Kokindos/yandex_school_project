@@ -35,7 +35,7 @@ class ServiceLocator {
       tasksStream: bloc.state.when(
         loaded: (list) => BehaviorSubject.seeded(list),
         loading: () => BehaviorSubject.seeded([]),
-        error: (_) => BehaviorSubject.seeded([]),
+        error: (_,list) => BehaviorSubject.seeded(list),
       ),
     );
     register();

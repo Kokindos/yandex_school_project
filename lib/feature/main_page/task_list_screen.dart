@@ -39,24 +39,30 @@ class TaskListScreen extends StatelessWidget {
           listener: (context, state) {
             if (state is TaskListErrorState) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Error, try again'),
+                SnackBar(
+                  content:
+                      Text('Error: ${state.message.toString()}, try again'),
                 ),
               );
             }
           },
           child: BlocBuilder<TaskListBloc, TaskListState>(
             builder: (context, state) {
-              if (state is TaskListLoadedState) {
-                return _TaskListPage(
-                  navigatorCallback: navigatorCallback,
-                  tasks: state.tasks,
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+              return state.when(
+                loaded: (tasks) {
+                  return _TaskListPage(
+                      tasks: tasks, navigatorCallback: navigatorCallback);
+                },
+                loading: () {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+                error: (_, tasks) {
+                  return _TaskListPage(
+                      tasks: tasks, navigatorCallback: navigatorCallback);
+                },
+              );
             },
           ),
         ),
@@ -165,7 +171,7 @@ class _TaskListPageState extends State<_TaskListPage> {
                       removeAnimationDuration:
                           const Duration(milliseconds: 150),
                       insertAnimationDuration:
-                          const Duration(milliseconds: 500),
+                          const Duration(milliseconds: 300),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 36),
@@ -227,7 +233,7 @@ class _ItemState extends State<_Item> {
       return false;
     } else {
       BlocProvider.of<TaskListBloc>(context)
-          .add(DeleteTaskEvent(task: widget.task));
+          .add(DeleteTaskEvent(task: Task.initial()));
       return true;
     }
   }

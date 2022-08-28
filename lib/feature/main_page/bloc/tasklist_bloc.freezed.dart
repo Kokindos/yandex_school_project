@@ -692,21 +692,21 @@ mixin _$TaskListState {
   TResult when<TResult extends Object?>({
     required TResult Function(List<Task> tasks) loaded,
     required TResult Function() loading,
-    required TResult Function(String message) error,
+    required TResult Function(String message, List<Task> tasks) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -824,7 +824,7 @@ class _$TaskListLoadedState implements TaskListLoadedState {
   TResult when<TResult extends Object?>({
     required TResult Function(List<Task> tasks) loaded,
     required TResult Function() loading,
-    required TResult Function(String message) error,
+    required TResult Function(String message, List<Task> tasks) error,
   }) {
     return loaded(tasks);
   }
@@ -834,7 +834,7 @@ class _$TaskListLoadedState implements TaskListLoadedState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
   }) {
     return loaded?.call(tasks);
   }
@@ -844,7 +844,7 @@ class _$TaskListLoadedState implements TaskListLoadedState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
@@ -941,7 +941,7 @@ class _$TaskListLoadingState implements TaskListLoadingState {
   TResult when<TResult extends Object?>({
     required TResult Function(List<Task> tasks) loaded,
     required TResult Function() loading,
-    required TResult Function(String message) error,
+    required TResult Function(String message, List<Task> tasks) error,
   }) {
     return loading();
   }
@@ -951,7 +951,7 @@ class _$TaskListLoadingState implements TaskListLoadingState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
   }) {
     return loading?.call();
   }
@@ -961,7 +961,7 @@ class _$TaskListLoadingState implements TaskListLoadingState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -1014,7 +1014,7 @@ abstract class _$$TaskListErrorStateCopyWith<$Res> {
   factory _$$TaskListErrorStateCopyWith(_$TaskListErrorState value,
           $Res Function(_$TaskListErrorState) then) =
       __$$TaskListErrorStateCopyWithImpl<$Res>;
-  $Res call({String message});
+  $Res call({String message, List<Task> tasks});
 }
 
 /// @nodoc
@@ -1031,12 +1031,17 @@ class __$$TaskListErrorStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? message = freezed,
+    Object? tasks = freezed,
   }) {
     return _then(_$TaskListErrorState(
       message: message == freezed
           ? _value.message
           : message // ignore: cast_nullable_to_non_nullable
               as String,
+      tasks: tasks == freezed
+          ? _value._tasks
+          : tasks // ignore: cast_nullable_to_non_nullable
+              as List<Task>,
     ));
   }
 }
@@ -1044,14 +1049,22 @@ class __$$TaskListErrorStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$TaskListErrorState implements TaskListErrorState {
-  const _$TaskListErrorState({required this.message});
+  const _$TaskListErrorState(
+      {required this.message, required final List<Task> tasks})
+      : _tasks = tasks;
 
   @override
   final String message;
+  final List<Task> _tasks;
+  @override
+  List<Task> get tasks {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tasks);
+  }
 
   @override
   String toString() {
-    return 'TaskListState.error(message: $message)';
+    return 'TaskListState.error(message: $message, tasks: $tasks)';
   }
 
   @override
@@ -1059,12 +1072,15 @@ class _$TaskListErrorState implements TaskListErrorState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$TaskListErrorState &&
-            const DeepCollectionEquality().equals(other.message, message));
+            const DeepCollectionEquality().equals(other.message, message) &&
+            const DeepCollectionEquality().equals(other._tasks, _tasks));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(message));
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(message),
+      const DeepCollectionEquality().hash(_tasks));
 
   @JsonKey(ignore: true)
   @override
@@ -1077,9 +1093,9 @@ class _$TaskListErrorState implements TaskListErrorState {
   TResult when<TResult extends Object?>({
     required TResult Function(List<Task> tasks) loaded,
     required TResult Function() loading,
-    required TResult Function(String message) error,
+    required TResult Function(String message, List<Task> tasks) error,
   }) {
-    return error(message);
+    return error(message, tasks);
   }
 
   @override
@@ -1087,9 +1103,9 @@ class _$TaskListErrorState implements TaskListErrorState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
   }) {
-    return error?.call(message);
+    return error?.call(message, tasks);
   }
 
   @override
@@ -1097,11 +1113,11 @@ class _$TaskListErrorState implements TaskListErrorState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(List<Task> tasks)? loaded,
     TResult Function()? loading,
-    TResult Function(String message)? error,
+    TResult Function(String message, List<Task> tasks)? error,
     required TResult orElse(),
   }) {
     if (error != null) {
-      return error(message);
+      return error(message, tasks);
     }
     return orElse();
   }
@@ -1142,10 +1158,12 @@ class _$TaskListErrorState implements TaskListErrorState {
 }
 
 abstract class TaskListErrorState implements TaskListState {
-  const factory TaskListErrorState({required final String message}) =
-      _$TaskListErrorState;
+  const factory TaskListErrorState(
+      {required final String message,
+      required final List<Task> tasks}) = _$TaskListErrorState;
 
   String get message;
+  List<Task> get tasks;
   @JsonKey(ignore: true)
   _$$TaskListErrorStateCopyWith<_$TaskListErrorState> get copyWith =>
       throw _privateConstructorUsedError;
