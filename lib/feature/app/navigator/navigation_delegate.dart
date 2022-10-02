@@ -8,6 +8,7 @@ import 'package:rxdart/rxdart.dart';
 
 class NavigationDelegate extends RouterDelegate<NavigatorConfigState>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NavigatorConfigState> {
+
   Task? task;
   late bool isNew = true;
 
