@@ -1,3 +1,4 @@
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -42,8 +43,23 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+    flavorDimensions "done"
 
+    productFlavors {
+        dev {
+            dimension "done"
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "[dev] Done"
+            versionNameSuffix "-dev"
+        }
+        prod {
+            dimension "done"
+            applicationIdSuffix ""
+            resValue "string", "app_name", "Done"
+        }
+    }
     defaultConfig {
+        multiDexEnabled true
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.yandex_project"
         // You can update the following values to match your application needs.
@@ -68,7 +84,9 @@ flutter {
 }
 
 dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation platform('com.google.firebase:firebase-bom:30.3.1')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
+

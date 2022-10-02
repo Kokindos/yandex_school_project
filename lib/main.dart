@@ -1,65 +1,39 @@
-import 'package:done/assets/theme/theme.dart';
-import 'package:done/common/di/di_container.dart';
-import 'package:done/common/routes/app_router.dart';
-import 'package:done/common/services/navigation_service.dart';
-import 'package:done/feature/main_page/task_list_screen.dart';
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
+import 'package:done/app.dart';
+import 'package:done/feature/app/models/priority.dart';
+import 'package:done/feature/app/models/task.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:overlay_support/overlay_support.dart';
-import 'package:provider/provider.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'common/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp();
-
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-  runApp(
-    const App(),
-  );
-}
-
-class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
-
-  @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  final NavigationService navigationService = NavigationService();
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<NavigationService>(create: (_) => navigationService),
-        ...DIContainer.instance.providers,
-      ],
-      child: OverlaySupport.global(
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          navigatorKey: navigationService.navigationKey,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            AppLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('ru'),
-          ],
-          theme: AppTheme.lightTheme,
-          onGenerateRoute: AppRouter.generateRoute,
-          home: const TaskListScreen(),
-          //initialRoute: AppRouter.mainScreen,
-        ),
-      ),
+  initLogger();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: "AIzaSyCgLq5h9WYeWRoAJs8VRyFxy5wDaHjcQMk",
+          projectId: "done2-943f0",
+          messagingSenderId: "887278312984",
+          appId: "1:887278312984:web:7fbe39b366e45faf6dad6d"),
     );
+  } else {
+    await Firebase.initializeApp();
   }
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  await Hive.initFlutter();
+  Hive.registerAdapter(TaskAdapter());
+  Hive.registerAdapter(PriorityAdapter());
+  await Hive.openBox<Task>('tasks');
+  AppMetrica.activate(const AppMetricaConfig(
+      'efa0a8e5-44c7-43c4-aa8d-25bd20dfafac'));
+  runApp(
+    const App(
+      isDebug: false,
+    ),
+  );
 }
